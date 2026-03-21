@@ -3,7 +3,40 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>★ divy's corner of the internet ★</title>
+  <title>divy's corner of the internet — toronto dev</title>
+
+  <!-- SEO -->
+  <meta name="description" content="divy's personal corner of the internet. toronto-based early career developer writing code, posting thoughts, and building things." />
+  <meta name="keywords" content="divy, divy developer, toronto developer, divy9586, dvyrj08, personal site, programmer toronto" />
+  <meta name="author" content="divy" />
+  <link rel="canonical" href="https://divyv.vercel.app/" />
+  <meta name="robots" content="index, follow" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://divyv.vercel.app/" />
+  <meta property="og:title" content="divy's corner of the internet" />
+  <meta property="og:description" content="toronto-based developer. early career. writing code and thinking too much about everything else." />
+  <meta property="og:image" content="https://divyv.vercel.app/og.png" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="divy's corner of the internet" />
+  <meta name="twitter:description" content="toronto-based developer. early career. writing code and thinking too much." />
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "divy",
+    "url": "https://divyv.vercel.app",
+    "sameAs": ["https://github.com/dvyrj08"],
+    "jobTitle": "Software Developer",
+    "address": { "@type": "PostalAddress", "addressLocality": "Toronto", "addressCountry": "CA" }
+  }
+  </script>
+
   <style>
     @import url('https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&family=Courier+Prime&display=swap');
 
@@ -155,9 +188,6 @@
       gap: 16px;
       align-items: start;
     }
-    @media (max-width: 620px) {
-      .grid { grid-template-columns: 1fr; }
-    }
 
     /* ── PANEL ── */
     .panel {
@@ -208,9 +238,7 @@
     }
 
     /* POST INPUT */
-    .post-form {
-      margin-bottom: 0;
-    }
+    .post-form { margin-bottom: 0; }
     .post-form textarea {
       width: 100%;
       background: #0a0a18;
@@ -231,9 +259,11 @@
       gap: 8px;
       margin-top: 8px;
       align-items: center;
+      flex-wrap: wrap;
     }
     .post-form input[type="text"] {
       flex: 1;
+      min-width: 80px;
       background: #0a0a18;
       border: 1px solid #333355;
       color: var(--text);
@@ -244,6 +274,13 @@
     }
     .post-form input[type="text"]:focus { border-color: var(--accent2); }
     .post-form input[type="text"]::placeholder { color: #555577; }
+    .post-error {
+      font-family: 'VT323', monospace;
+      font-size: 16px;
+      color: #ff4444;
+      margin-top: 6px;
+      display: none;
+    }
     .btn {
       font-family: 'Press Start 2P', monospace;
       font-size: 8px;
@@ -339,6 +376,8 @@
     .counter-digits {
       display: inline-flex;
       gap: 3px;
+      flex-wrap: wrap;
+      justify-content: center;
     }
     .digit {
       background: #000;
@@ -369,7 +408,6 @@
     .marquee-inner {
       display: inline-block;
       white-space: nowrap;
-      animation: marquee 14s linear infinite;
       color: var(--accent2);
       font-family: 'VT323', monospace;
       font-size: 16px;
@@ -392,7 +430,7 @@
     .mood-row:last-child { border-bottom: none; }
     .mood-val { color: var(--accent2); }
 
-    /* ── GUESTBOOK ── */
+    /* ── GUESTBOOL ── */
     .guestbook-entry {
       border-bottom: 1px dashed #333355;
       padding: 10px 0;
@@ -401,6 +439,30 @@
     .guestbook-entry:last-child { border-bottom: none; }
     .gb-name { font-family: 'Press Start 2P', monospace; font-size: 8px; color: var(--accent1); margin-bottom: 4px; }
     .gb-msg { color: var(--muted); }
+
+    /* ── EXCUSE GENERATOR ── */
+    .excuse-box {
+      background: #0a0a18;
+      border: 1px solid var(--border);
+      padding: 16px;
+      font-family: 'Courier Prime', monospace;
+      font-size: 15px;
+      color: var(--accent2);
+      line-height: 1.6;
+      min-height: 60px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .excuse-tag {
+      font-family: 'VT323', monospace;
+      font-size: 14px;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 12px;
+    }
 
     /* ── FOOTER ── */
     footer {
@@ -416,6 +478,26 @@
     /* ── PAGE SECTIONS (show/hide) ── */
     .page { display: none; }
     .page.active { display: block; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 620px) {
+      .grid { grid-template-columns: 1fr; }
+      .site-title { font-size: 15px; letter-spacing: 1px; }
+      .site-subtitle { font-size: 18px; }
+      .status-bar { gap: 10px; font-size: 16px; }
+      nav a { font-size: 7px; padding: 10px 3px; }
+      .digit { width: 20px; height: 26px; font-size: 11px; }
+    }
+    @media (max-width: 420px) {
+      .site-wrapper { padding: 12px 10px 40px; }
+      header { padding: 20px 12px 14px; }
+      .site-title { font-size: 12px; }
+      .site-subtitle { font-size: 16px; }
+      nav a { font-size: 6px; padding: 8px 2px; }
+      .panel-header { font-size: 7px; }
+      .btn { font-size: 7px; padding: 8px 10px; }
+      .stat-num { font-size: 10px; }
+    }
   </style>
 </head>
 <body>
@@ -442,6 +524,7 @@
     <a class="active" onclick="showPage('feed', this)">📋 FEED</a>
     <a onclick="showPage('about', this)">👾 ABOUT</a>
     <a onclick="showPage('links', this)">🔗 LINKS</a>
+    <a onclick="showPage('excuse', this)">🎲 EXCUSE</a>
   </nav>
 
   <!-- MAIN CONTENT GRID -->
@@ -461,8 +544,10 @@
               <textarea id="postInput" placeholder="what's on your mind..."></textarea>
               <div class="post-form-row">
                 <input type="text" id="tagInput" placeholder="tag (optional)" />
+                <input type="text" id="inviteCodeInput" placeholder="invite code" />
                 <button class="btn" onclick="addPost()">POST IT</button>
               </div>
+              <div class="post-error" id="postError"></div>
             </div>
           </div>
         </div>
@@ -513,7 +598,7 @@
           <div class="panel-body">
             <ul class="links-list">
               <li>
-                <a href="https://github.com/" target="_blank">
+                <a href="https://github.com/dvyrj08" target="_blank">
                   <span class="link-icon">🐙</span>
                   <span>
                     github
@@ -562,10 +647,24 @@
                 <div class="gb-msg">sick page dude 🔥</div>
               </div>
             </div>
-            <div style="margin-top:12px; display:flex; gap:8px;">
-              <input type="text" id="gbName" placeholder="your name" style="background:#0a0a18;border:1px solid #333355;color:var(--text);font-family:Courier Prime,monospace;font-size:13px;padding:7px 10px;outline:none;flex:1;" />
-              <input type="text" id="gbMsg" placeholder="leave a message" style="background:#0a0a18;border:1px solid #333355;color:var(--text);font-family:Courier Prime,monospace;font-size:13px;padding:7px 10px;outline:none;flex:2;" />
+            <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
+              <input type="text" id="gbName" placeholder="your name" style="background:#0a0a18;border:1px solid #333355;color:var(--text);font-family:Courier Prime,monospace;font-size:13px;padding:7px 10px;outline:none;flex:1;min-width:80px;" />
+              <input type="text" id="gbMsg" placeholder="leave a message" style="background:#0a0a18;border:1px solid #333355;color:var(--text);font-family:Courier Prime,monospace;font-size:13px;padding:7px 10px;outline:none;flex:2;min-width:100px;" />
               <button class="btn" onclick="addGuestbookEntry()">SIGN</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EXCUSE PAGE -->
+      <div id="page-excuse" class="page">
+        <div class="panel">
+          <div class="panel-header"><span class="icon">🎲</span> WORK EXCUSE GENERATOR</div>
+          <div class="panel-body">
+            <div class="excuse-tag">need a reason to disappear? we got you.</div>
+            <div class="excuse-box" id="excuseBox">press the button. receive absolution.</div>
+            <div style="text-align:center;">
+              <button class="btn" onclick="generateExcuse()">���� GENERATE EXCUSE</button>
             </div>
           </div>
         </div>
@@ -655,6 +754,27 @@
   localStorage.setItem('dv_visits', visits);
   renderCounter(visits);
 
+  // ─── INVITE CODES ─────────────────────────────────────────────
+  const VALID_CODES = [
+    'DIVY2026', 'COFFEE404', 'TORONTO99', 'PIXEL001',
+    'RETRO777', 'BUGFIXER', 'DEVMODE0', 'STARFIELD',
+    'PURPLEHZ', 'NEON2026', 'HACKTIME', 'BUILDSZN'
+  ];
+
+  function isValidCode(code) {
+    const upper = code.toUpperCase().trim();
+    if (!VALID_CODES.includes(upper)) return false;
+    const used = JSON.parse(localStorage.getItem('dv_used_codes') || '[]');
+    return !used.includes(upper);
+  }
+
+  function markCodeUsed(code) {
+    const upper = code.toUpperCase().trim();
+    const used = JSON.parse(localStorage.getItem('dv_used_codes') || '[]');
+    used.push(upper);
+    localStorage.setItem('dv_used_codes', JSON.stringify(used));
+  }
+
   // ─── POSTS ───────────────────────────────────────────────────
   const defaultPosts = [
     { text: "why does CSS work perfectly in my head and nowhere else", tag: "dev", date: "mar 20" },
@@ -692,7 +812,26 @@
   function addPost() {
     const text = document.getElementById('postInput').value.trim();
     const tag = document.getElementById('tagInput').value.trim();
+    const code = document.getElementById('inviteCodeInput').value.trim();
+    const errEl = document.getElementById('postError');
+
     if (!text) return;
+
+    if (!code) {
+      errEl.textContent = '⚠ invite code required to post.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    if (!isValidCode(code)) {
+      errEl.textContent = '✕ invalid or already used code.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    errEl.style.display = 'none';
+    markCodeUsed(code);
+
     const posts = loadPosts();
     const now = new Date();
     const date = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
@@ -700,6 +839,7 @@
     savePosts(posts);
     document.getElementById('postInput').value = '';
     document.getElementById('tagInput').value = '';
+    document.getElementById('inviteCodeInput').value = '';
     renderPosts();
   }
 
@@ -738,6 +878,66 @@
     renderGuestbook();
   }
 
+  // ─── EXCUSE GENERATOR ────────────────────────────────────────
+  const EXCUSES = [
+    "my wifi was acting up and i couldn't connect to anything",
+    "i had a doctor's appointment i kept forgetting to mention",
+    "my cat knocked my laptop off the desk",
+    "i was on a call that ran way longer than expected",
+    "i was deep in a debugging session and lost track of time",
+    "my laptop needed critical updates and forced a restart",
+    "i had a family thing come up last minute",
+    "my alarm didn't go off. or i turned it off. unclear.",
+    "i was helping a teammate who was completely blocked",
+    "i had an unexpected delivery i had to wait for",
+    "my internet provider had an outage in my area",
+    "i was reviewing some documentation before the meeting",
+    "i had to take my car in for something urgent",
+    "i was dealing with a billing issue that took forever",
+    "i was on an unexpected call with a client",
+    "my headphones broke mid-standup and i had to troubleshoot",
+    "i was waiting for a dependency to finish deploying",
+    "i had to run a quick errand. it was not quick.",
+    "i was investigating what i thought was a production incident",
+    "my VPN kept dropping and i couldn't access anything",
+    "i was waiting on code review feedback before moving forward",
+    "i had a really bad migraine",
+    "i was stuck in traffic. yes i know i work from home.",
+    "my IDE crashed and ate my unsaved work",
+    "i was doing research for the sprint. deep research.",
+    "i was pair programming with someone and it went long",
+    "i had to fill out some HR paperwork that expired",
+    "my power went out for like 20 minutes",
+    "i was onboarding a new tool the team apparently needed",
+    "i was writing unit tests. someone has to.",
+    "my coffee machine broke and it was a whole thing",
+    "i was blocked by a third-party API being completely down",
+    "i had an impromptu 1:1 with my manager",
+    "i had to urgently fix a typo that made it to production",
+    "my dog had an emergency. i don't have a dog.",
+    "i was doing performance profiling and went down a rabbit hole",
+    "i was responding to some security alert emails",
+    "i had to pick up a prescription",
+    "i was mentoring someone and it took longer than expected",
+    "my monitor died and i had to dig out the old one",
+    "i was waiting for the CI pipeline to finish",
+    "i was dealing with merge conflicts from hell",
+    "my keyboard stopped working mid-task",
+    "i was updating my local dependencies and something broke",
+    "i had a dentist appointment i'd rescheduled twice already",
+    "i was cleaning up tech debt. unprompted. you're welcome.",
+    "my phone kept going off and i had to deal with it",
+    "i was stress-testing the new feature manually",
+    "i was doing a quick code audit. it wasn't quick.",
+    "i genuinely thought today was tuesday."
+  ];
+
+  function generateExcuse() {
+    const box = document.getElementById('excuseBox');
+    const excuse = EXCUSES[Math.floor(Math.random() * EXCUSES.length)];
+    box.textContent = '"' + excuse + '"';
+  }
+
   // ─── NAVIGATION ──────────────────────────────────────────────
   function showPage(name, link) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -752,6 +952,8 @@
   }
 
   // ─── SPOTIFY NOW PLAYING ─────────────────────────────────────
+  let lastTrackId = null;
+
   async function fetchNowPlaying() {
     const widget = document.getElementById('spotifyWidget');
     try {
@@ -759,42 +961,58 @@
       const data = await res.json();
 
       if (!data.title) {
-        widget.innerHTML = `<div style="font-family:VT323,monospace;font-size:17px;color:var(--muted);">nothing playing rn 🔇</div>`;
+        if (lastTrackId !== 'none') {
+          lastTrackId = 'none';
+          widget.innerHTML = `<div style="font-family:VT323,monospace;font-size:17px;color:var(--muted);">nothing playing rn 🔇</div>`;
+        }
         return;
       }
+
+      const trackId = data.title + data.artist + data.isPlaying;
+      if (trackId === lastTrackId) return;
+      lastTrackId = trackId;
 
       const statusLabel = data.isPlaying
         ? `<span style="color:var(--accent2)"><span class="dot" style="display:inline-block;width:8px;height:8px;background:var(--accent2);border-radius:50%;animation:pulse 1.5s ease-in-out infinite;margin-right:5px;"></span>now playing</span>`
         : `<span style="color:var(--muted)">last played</span>`;
 
+      // marquee speed scales with track name length
+      const marqueeText = `♪ ${data.title} — ${data.artist} ♪ ──── ♪ ${data.title} — ${data.artist} ♪`;
+      const marqueeDuration = Math.max(10, marqueeText.length * 0.25);
+
+      // album art responsive size
+      const artSize = window.innerWidth < 420 ? '80px' : '120px';
+
       widget.innerHTML = `
-        <a href="${data.songUrl}" target="_blank" style="display:flex;gap:12px;align-items:center;text-decoration:none;">
+    <a href="${data.songUrl}" target="_blank" style="display:flex;gap:12px;align-items:flex-start;text-decoration:none;">
           <img src="${data.albumArt}" alt="album art"
-            style="width:160px;height:160px;border:2px solid var(--border);flex-shrink:0;image-rendering:auto;" />
-          <div style="overflow:hidden;">
-            <div style="font-family:'Press Start 2P',monospace;font-size:8px;color:var(--accent1);white-space:nowraw;overflow:hidden;text-overflow:ellipsis;margin-bottom:5px;">${escapeHTML(data.title)}</div>
-            <div style="font-family:VT323,monospace;font-size:16px;color:var(--text);white-space:nowraw;overflow:hidden;text-overflow:ellipsis;">${escapeHTML(data.artist)}</div>
-            <div style="font-family:VT323,monospace;font-size:14px;color:var(--muted);white-space:nowraw;owerflow:hidden;text-overflow:ellipsis;">${escapeHTML(data.album)}</div>
+            style="width:${artSize};height:${artSize};border:2px solid var(--border);flex-shrink:0;image-rendering:auto;" />
+          <div style="min-width:0;flex:1;">
+            <div style="font-family:'Press Start 2P',monospace;font-size:10px;color:var(--accent1);line-height:1.5;word-break:break-word;margin-bottom:6px;">${escapeHTML(data.title)}</div>
+            <div style="font-family:VT323,monospace;font-size:15px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHTML(data.artist)}</div>
+            <div style="font-family:VT323,monospace;font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHTML(data.album)}</div>
             <div style="margin-top:5px;font-family:VT323,monospace;font-size:14px;">${statusLabel}</div>
           </div>
         </a>
         <div class="marquee-wrap" style="margin-top:10px;">
-          <span class="marquee-inner">♪ ${escapeHTML(data.title)} — ${escapeHTML(data.artist)} ♪ ──── ♪ ${escapeHTML(data.title)} — ${escapeHTML(data.artist)} ♪</span>
+          <span class="marquee-inner" style="animation:marquee ${marqueeDuration}s linear infinite;">${escapeHTML(marqueeText)}</span>
         </div>
       `;
     } catch (e) {
-      widget.innerHTML = `<div style="font-family:VT323,monospace;font-size:16px;color:var(--muted);">spotify offline 🔇</div>`;
+      if (lastTrackId !== 'error') {
+        lastTrackId = 'error';
+        widget.innerHTML = `<div style="font-family:VT323,monospace;font-size:16px;color:var(--muted);">spotify offline 🔇</div>`;
+      }
     }
   }
 
   fetchNowPlaying();
-  setInterval(fetchNowPlaying, 30000); // refresh every 30s
+  setInterval(fetchNowPlaying, 4000); // poll every 4s for near-live updates
 
   // ─── INIT ────────────────────────────────────────────────────
   renderPosts();
   renderGuestbook();
 
-  // Enter key to post
   document.getElementById('postInput').addEventListener('keydown', e => {
     if (e.key === 'Enter' && e.ctrlKey) addPost();
   });
