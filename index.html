@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>★ divy's corner of the internet ★</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&family=Courier+Prime&display=swap');
+
+    :root {
+      --bg: #0d0d1a;
+      --panel: #12122a;
+      --border: #6633cc;
+      --accent1: #ff66ff;
+      --accent2: #33ffcc;
+      --accent3: #ffcc00;
+      --text: #e0e0f0;
+      --muted: #9999bb;
+      --link: #cc99ff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Courier Prime', monospace;
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── STARFIELD ── */
+    #stars {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .star {
+      position: absolute;
+      width: 2px; height: 2px;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle var(--d, 3s) ease-in-out infinite;
+      opacity: var(--o, 0.5);
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: var(--o, 0.5); }
+      50% { opacity: 0.1; }
+    }
+
+    /* ── LAYOUT ── */
+    .site-wrapper {
+      position: relative;
+      z-index: 1;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 20px 16px 60px;
+    }
+
+    /* ── HEADER ── */
+    header {
+      text-align: center;
+      padding: 30px 20px 20px;
+      border: 2px solid var(--border);
+      background: var(--panel);
+      margin-bottom: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #ff66ff, #6633cc, #33ffcc, #ffcc00, #ff66ff);
+      background-size: 200%;
+      animation: shimmer 3s linear infinite;
+    }
+    @keyframes shimmer {
+      0% { background-position: 0%; }
+      100% { background-position: 200%; }
+    }
+    .site-title {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 22px;
+      color: var(--accent1);
+      text-shadow: 0 0 12px var(--accent1), 0 0 30px #cc00cc;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+    .site-subtitle {
+      font-family: 'VT323', monospace;
+      font-size: 22px;
+      color: var(--accent2);
+      letter-spacing: 3px;
+    }
+    .status-bar {
+      margin-top: 14px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      font-family: 'VT323', monospace;
+      font-size: 18px;
+      color: var(--muted);
+    }
+    .status-bar .dot {
+      display: inline-block;
+      width: 8px; height: 8px;
+      background: var(--accent2);
+      border-radius: 50%;
+      animation: pulse 1.5s ease-in-out infinite;
+      margin-right: 6px;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 6px var(--accent2); }
+      50% { opacity: 0.3; box-shadow: none; }
+    }
+
+    /* ── NAV ── */
+    nav {
+      display: flex;
+      gap: 0;
+      margin-bottom: 16px;
+      border: 2px solid var(--border);
+      overflow: hidden;
+    }
+    nav a {
+      flex: 1;
+      text-align: center;
+      padding: 10px 6px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 9px;
+      color: var(--muted);
+      text-decoration: none;
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+      transition: background 0.2s, color 0.2s;
+      cursor: pointer;
+    }
+    nav a:last-child { border-right: none; }
+    nav a:hover, nav a.active {
+      background: var(--border);
+      color: white;
+    }
+
+    /* ── GRID ── */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 16px;
+      align-items: start;
+    }
+    @media (max-width: 620px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── PANEL ── */
+    .panel {
+      border: 2px solid var(--border);
+      background: var(--panel);
+      margin-bottom: 16px;
+    }
+    .panel-header {
+      background: var(--border);
+      padding: 7px 12px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 9px;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .panel-header .icon { font-size: 14px; }
+    .panel-body { padding: 14px; }
+
+    /* ── FEED ── */
+    .post {
+      border-bottom: 1px dashed #333355;
+      padding: 12px 0;
+    }
+    .post:last-child { border-bottom: none; padding-bottom: 0; }
+    .post:first-child { padding-top: 0; }
+    .post-meta {
+      font-family: 'VT323', monospace;
+      font-size: 16px;
+      color: var(--accent3);
+      margin-bottom: 4px;
+    }
+    .post-content {
+      color: var(--text);
+      line-height: 1.7;
+    }
+    .post-tag {
+      display: inline-block;
+      background: #1a1a3a;
+      border: 1px solid var(--border);
+      color: var(--link);
+      font-family: 'VT323', monospace;
+      font-size: 14px;
+      padding: 1px 8px;
+      margin-top: 8px;
+      margin-right: 4px;
+    }
+
+    /* POST INPUT */
+    .post-form {
+      margin-bottom: 0;
+    }
+    .post-form textarea {
+      width: 100%;
+      background: #0a0a18;
+      border: 1px solid #333355;
+      color: var(--text);
+      font-family: 'Courier Prime', monospace;
+      font-size: 14px;
+      padding: 10px;
+      resize: vertical;
+      min-height: 70px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .post-form textarea:focus { border-color: var(--accent1); }
+    .post-form textarea::placeholder { color: #555577; }
+    .post-form-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+      align-items: center;
+    }
+    .post-form input[type="text"] {
+      flex: 1;
+      background: #0a0a18;
+      border: 1px solid #333355;
+      color: var(--text);
+      font-family: 'Courier Prime', monospace;
+      font-size: 13px;
+      padding: 7px 10px;
+      outline: none;
+    }
+    .post-form input[type="text"]:focus { border-color: var(--accent2); }
+    .post-form input[type="text"]::placeholder { color: #555577; }
+    .btn {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 8px;
+      padding: 9px 14px;
+      background: var(--border);
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      white-space: nowrap;
+    }
+    .btn:hover { background: var(--accent1); }
+    .btn:active { transform: scale(0.97); }
+
+    /* ── ABOUT ── */
+    .about-avatar {
+      width: 72px; height: 72px;
+      border: 3px solid var(--accent1);
+      border-radius: 4px;
+      float: left;
+      margin: 0 14px 10px 0;
+      background: #1a0a2a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 38px;
+      flex-shrink: 0;
+      box-shadow: 0 0 16px var(--accent1);
+    }
+    .about-name {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 11px;
+      color: var(--accent1);
+      margin-bottom: 6px;
+    }
+    .about-text { color: var(--muted); line-height: 1.7; font-size: 14px; }
+    .about-text::after { content: ''; display: block; clear: both; }
+    .stat-row {
+      display: flex;
+      gap: 0;
+      margin-top: 12px;
+      border: 1px solid #333355;
+      overflow: hidden;
+    }
+    .stat {
+      flex: 1;
+      text-align: center;
+      padding: 8px 4px;
+      border-right: 1px solid #333355;
+    }
+    .stat:last-child { border-right: none; }
+    .stat-num {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 12px;
+      color: var(--accent2);
+      display: block;
+    }
+    .stat-label {
+      font-family: 'VT323', monospace;
+      font-size: 14px;
+      color: var(--muted);
+      margin-top: 2px;
+      display: block;
+    }
+
+    /* ── LINKS ── */
+    .links-list { list-style: none; }
+    .links-list li {
+      border-bottom: 1px dashed #333355;
+      padding: 8px 0;
+    }
+    .links-list li:last-child { border-bottom: none; }
+    .links-list a {
+      color: var(--link);
+      text-decoration: none;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: color 0.2s;
+    }
+    .links-list a:hover { color: var(--accent1); }
+    .links-list .link-icon { font-size: 20px; width: 24px; text-align: center; }
+    .links-list .link-desc { color: var(--muted); font-size: 12px; display: block; }
+
+    /* ── VISITOR COUNTER ── */
+    .visitor-counter {
+      text-align: center;
+      padding: 12px;
+      font-family: 'VT323', monospace;
+    }
+    .counter-label { font-size: 14px; color: var(--muted); margin-bottom: 6px; }
+    .counter-digits {
+      display: inline-flex;
+      gap: 3px;
+    }
+    .digit {
+      background: #000;
+      border: 1px solid #336633;
+      color: #00ff44;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 14px;
+      width: 24px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 0 6px #004400;
+    }
+
+    /* ── NOW PLAYING ── */
+    .now-playing {
+      font-family: 'VT323', monospace;
+      font-size: 17px;
+      color: var(--accent3);
+    }
+    .marquee-wrap {
+      overflow: hidden;
+      border: 1px solid #333355;
+      padding: 4px 0;
+      margin-top: 8px;
+    }
+    .marquee-inner {
+      display: inline-block;
+      white-space: nowrap;
+      animation: marquee 14s linear infinite;
+      color: var(--accent2);
+      font-family: 'VT323', monospace;
+      font-size: 16px;
+    }
+    @keyframes marquee {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
+
+    /* ── MOOD WIDGET ── */
+    .mood-row {
+      display: flex;
+      justify-content: space-between;
+      font-family: 'VT323', monospace;
+      font-size: 17px;
+      padding: 5px 0;
+      border-bottom: 1px dashed #333355;
+      color: var(--muted);
+    }
+    .mood-row:last-child { border-bottom: none; }
+    .mood-val { color: var(--accent2); }
+
+    /* ── GUESTBOOK ── */
+    .guestbook-entry {
+      border-bottom: 1px dashed #333355;
+      padding: 10px 0;
+      font-size: 14px;
+    }
+    .guestbook-entry:last-child { border-bottom: none; }
+    .gb-name { font-family: 'Press Start 2P', monospace; font-size: 8px; color: var(--accent1); margin-bottom: 4px; }
+    .gb-msg { color: var(--muted); }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      margin-top: 24px;
+      font-family: 'VT323', monospace;
+      font-size: 16px;
+      color: #444466;
+      border-top: 1px dashed #333355;
+      padding-top: 16px;
+    }
+
+    /* ── PAGE SECTIONS (show/hide) ── */
+    .page { display: none; }
+    .page.active { display: block; }
+  </style>
+</head>
+<body>
+
+<!-- Starfield -->
+<div id="stars"></div>
+
+<div class="site-wrapper">
+
+  <!-- HEADER -->
+  <header>
+    <div class="site-title">★ divy's page ★</div>
+    <div class="site-subtitle">welcome to my corner of the internet</div>
+    <div class="status-bar">
+      <span><span class="dot"></span>online</span>
+      <span>📍 toronto, canada</span>
+      <span>🖥️ programmer</span>
+      <span>age: 24</span>
+    </div>
+  </header>
+
+  <!-- NAV -->
+  <nav>
+    <a class="active" onclick="showPage('feed', this)">📋 FEED</a>
+    <a onclick="showPage('about', this)">👾 ABOUT</a>
+    <a onclick="showPage('links', this)">🔗 LINKS</a>
+  </nav>
+
+  <!-- MAIN CONTENT GRID -->
+  <div class="grid">
+
+    <!-- LEFT COLUMN: PAGES -->
+    <div>
+
+      <!-- FEED PAGE -->
+      <div id="page-feed" class="page active">
+
+        <!-- Post composer -->
+        <div class="panel">
+          <div class="panel-header"><span class="icon">✏️</span> NEW POST</div>
+          <div class="panel-body">
+            <div class="post-form">
+              <textarea id="postInput" placeholder="what's on your mind..."></textarea>
+              <div class="post-form-row">
+                <input type="text" id="tagInput" placeholder="tag (optional)" />
+                <button class="btn" onclick="addPost()">POST IT</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feed -->
+        <div class="panel">
+          <div class="panel-header"><span class="icon">📋</span> LATEST POSTS</div>
+          <div class="panel-body" id="feedContainer">
+            <!-- pre-seeded posts -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ABOUT PAGE -->
+      <div id="page-about" class="page">
+        <div class="panel">
+          <div class="panel-header"><span class="icon">👾</span> ABOUT ME</div>
+          <div class="panel-body">
+            <div class="about-text">
+              <div class="about-avatar">👾</div>
+              <div class="about-name">divy</div>
+              hey — i'm divy. 24, based in toronto. i write code for a living and think too much about everything else.<br><br>
+              early career dev figuring it out. currently grinding through whatever problem is on my screen. sometimes that problem is the code, sometimes it's me.<br><br>
+              this is my little spot on the internet where i don't have to perform for anyone.
+            </div>
+            <div class="stat-row">
+              <div class="stat">
+                <span class="stat-num" id="postCount">0</span>
+                <span class="stat-label">posts</span>
+              </div>
+              <div class="stat">
+                <span class="stat-num">24</span>
+                <span class="stat-label">age</span>
+              </div>
+              <div class="stat">
+                <span class="stat-num">∞</span>
+                <span class="stat-label">bugs fixed</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LINKS PAGE -->
+      <div id="page-links" class="page">
+        <div class="panel">
+          <div class="panel-header"><span class="icon">🔗</span> FIND ME ONLINE</div>
+          <div class="panel-body">
+            <ul class="links-list">
+              <li>
+                <a href="https://github.com/" target="_blank">
+                  <span class="link-icon">🐙</span>
+                  <span>
+                    github
+                    <span class="link-desc">where the code actually lives</span>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a href="https://twitter.com/" target="_blank">
+                  <span class="link-icon">🐦</span>
+                  <span>
+                    twitter / x
+                    <span class="link-desc">hot takes and retweets</span>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a href="https://linkedin.com/" target="_blank">
+                  <span class="link-icon">💼</span>
+                  <span>
+                    linkedin
+                    <span class="link-desc">professional facade</span>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a href="mailto:divy9586@gmail.com">
+                  <span class="link-icon">📧</span>
+                  <span>
+                    email
+                    <span class="link-desc">divy9586@gmail.com</span>
+                  </span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Guestbook -->
+        <div class="panel">
+          <div class="panel-header"><span class="icon">📖</span> GUESTBOOK</div>
+          <div class="panel-body">
+            <div id="guestbook">
+              <div class="guestbook-entry">
+                <div class="gb-name">anonymous visitor</div>
+                <div class="gb-msg">sick page dude 🔥</div>
+              </div>
+            </div>
+            <div style="margin-top:12px; display:flex; gap:8px;">
+              <input type="text" id="gbName" placeholder="your name" style="background:#0a0a18;border:1px solid #333355;color:var(--text);font-family:Courier Prime,monospace;font-size:13px;padding:7px 10px;outline:none;flex:1;" />
+              <input type="text" id="gbMsg" placeholder="leave a message" style="background:#0a0a18;border:1px solid #333355;color:var(--text);font-family:Courier Prime,monospace;font-size:13px;padding:7px 10px;outline:none;flex:2;" />
+              <button class="btn" onclick="addGuestbookEntry()">SIGN</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end left col -->
+
+    <!-- RIGHT SIDEBAR -->
+    <div>
+
+      <!-- Visitor counter -->
+      <div class="panel">
+        <div class="panel-header"><span class="icon">👁️</span> VISITORS</div>
+        <div class="panel-body visitor-counter">
+          <div class="counter-label">you are visitor #</div>
+          <div class="counter-digits" id="counterDigits"></div>
+        </div>
+      </div>
+
+      <!-- Now playing -->
+      <div class="panel">
+        <div class="panel-header"><span class="icon">🎵</span> NOW PLAYING</div>
+        <div class="panel-body" id="spotifyWidget">
+          <div style="font-family:VT323,monospace;font-size:16px;color:var(--muted);">loading...</div>
+        </div>
+      </div>
+
+      <!-- Mood widget -->
+      <div class="panel">
+        <div class="panel-header"><span class="icon">🧠</span> CURRENT STATUS</div>
+        <div class="panel-body">
+          <div class="mood-row"><span>mood</span><span class="mood-val">☕ caffeinated</span></div>
+          <div class="mood-row"><span>currently</span><span class="mood-val">🖥️ coding</span></div>
+          <div class="mood-row"><span>weather</span><span class="mood-val">🌨️ toronto</span></div>
+          <div class="mood-row"><span>feeling</span><span class="mood-val">🧩 building</span></div>
+        </div>
+      </div>
+
+      <!-- Site info -->
+      <div class="panel">
+        <div class="panel-header"><span class="icon">⚙️</span> SITE INFO</div>
+        <div class="panel-body" style="font-family: VT323, monospace; font-size: 16px; color: var(--muted); line-height: 2;">
+          <div>🗓️ est. 2026</div>
+          <div>🌐 hand-crafted html</div>
+          <div>✨ no frameworks</div>
+          <div>🚫 no ads ever</div>
+          <div>💜 made in toronto</div>
+        </div>
+      </div>
+
+    </div><!-- end sidebar -->
+  </div><!-- end grid -->
+
+  <footer>
+    ★ made with ❤️ and too much caffeine ★ divy © 2026 ★
+    <br><span style="font-size:13px">best viewed with your eyes open</span>
+  </footer>
+
+</div><!-- end wrapper -->
+
+<script>
+  // ─── STARFIELD ───────────────────────────────────────────────
+  const starsEl = document.getElementById('stars');
+  for (let i = 0; i < 120; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    s.style.setProperty('--d', (2 + Math.random() * 4).toFixed(1) + 's');
+    s.style.setProperty('--o', (0.2 + Math.random() * 0.8).toFixed(2));
+    s.style.left = Math.random() * 100 + '%';
+    s.style.top = Math.random() * 100 + '%';
+    starsEl.appendChild(s);
+  }
+
+  // ─── VISITOR COUNTER ─────────────────────────────────────────
+  function renderCounter(n) {
+    const s = String(n).padStart(7, '0');
+    const el = document.getElementById('counterDigits');
+    el.innerHTML = '';
+    for (const c of s) {
+      const d = document.createElement('div');
+      d.className = 'digit';
+      d.textContent = c;
+      el.appendChild(d);
+    }
+  }
+  let visits = parseInt(localStorage.getItem('dv_visits') || '1336', 10) + 1;
+  localStorage.setItem('dv_visits', visits);
+  renderCounter(visits);
+
+  // ─── POSTS ───────────────────────────────────────────────────
+  const defaultPosts = [
+    { text: "why does CSS work perfectly in my head and nowhere else", tag: "dev", date: "mar 20" },
+    { text: "toronto in march is just november with better propaganda", tag: "life", date: "mar 19" },
+    { text: "built something cool today. it broke by end of day. classic.", tag: "dev", date: "mar 18" },
+  ];
+
+  function loadPosts() {
+    const stored = localStorage.getItem('dv_posts');
+    return stored ? JSON.parse(stored) : defaultPosts;
+  }
+
+  function savePosts(posts) {
+    localStorage.setItem('dv_posts', JSON.stringify(posts));
+  }
+
+  function renderPosts() {
+    const posts = loadPosts();
+    const container = document.getElementById('feedContainer');
+    document.getElementById('postCount').textContent = posts.length;
+    if (!posts.length) {
+      container.innerHTML = '<div style="color:var(--muted); font-style:italic;">no posts yet. say something.</div>';
+      return;
+    }
+    container.innerHTML = posts.map((p, i) => `
+      <div class="post">
+        <div class="post-meta">📌 ${p.date || 'recently'}</div>
+        <div class="post-content">${escapeHTML(p.text)}</div>
+        ${p.tag ? `<span class="post-tag">#${escapeHTML(p.tag)}</span>` : ''}
+        <button onclick="deletePost(${i})" style="float:right;background:none;border:none;color:#555577;cursor:pointer;font-size:11px;font-family:VT323,monospace;margin-top:4px;">✕ delete</button>
+      </div>
+    `).join('');
+  }
+
+  function addPost() {
+    const text = document.getElementById('postInput').value.trim();
+    const tag = document.getElementById('tagInput').value.trim();
+    if (!text) return;
+    const posts = loadPosts();
+    const now = new Date();
+    const date = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    posts.unshift({ text, tag, date });
+    savePosts(posts);
+    document.getElementById('postInput').value = '';
+    document.getElementById('tagInput').value = '';
+    renderPosts();
+  }
+
+  function deletePost(i) {
+    const posts = loadPosts();
+    posts.splice(i, 1);
+    savePosts(posts);
+    renderPosts();
+  }
+
+  // ─── GUESTBOOK ───────────────────────────────────────────────
+  function loadGuests() {
+    const stored = localStorage.getItem('dv_guests');
+    return stored ? JSON.parse(stored) : [{ name: 'anonymous visitor', msg: 'sick page dude 🔥' }];
+  }
+
+  function renderGuestbook() {
+    const entries = loadGuests();
+    document.getElementById('guestbook').innerHTML = entries.map(e => `
+      <div class="guestbook-entry">
+        <div class="gb-name">${escapeHTML(e.name)}</div>
+        <div class="gb-msg">${escapeHTML(e.msg)}</div>
+      </div>
+    `).join('');
+  }
+
+  function addGuestbookEntry() {
+    const name = document.getElementById('gbName').value.trim() || 'anonymous';
+    const msg = document.getElementById('gbMsg').value.trim();
+    if (!msg) return;
+    const entries = loadGuests();
+    entries.unshift({ name, msg });
+    localStorage.setItem('dv_guests', JSON.stringify(entries));
+    document.getElementById('gbName').value = '';
+    document.getElementById('gbMsg').value = '';
+    renderGuestbook();
+  }
+
+  // ─── NAVIGATION ──────────────────────────────────────────────
+  function showPage(name, link) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+    link.classList.add('active');
+  }
+
+  // ─── UTILS ───────────────────────────────────────────────────
+  function escapeHTML(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ─── SPOTIFY NOW PLAYING ─────────────────────────────────────
+  async function fetchNowPlaying() {
+    const widget = document.getElementById('spotifyWidget');
+    try {
+      const res = await fetch('/api/spotify');
+      const data = await res.json();
+
+      if (!data.title) {
+        widget.innerHTML = `<div style="font-family:VT323,monospace;font-size:17px;color:var(--muted);">nothing playing rn 🔇</div>`;
+        return;
+      }
+
+      const statusLabel = data.isPlaying
+        ? `<span style="color:var(--accent2)"><span class="dot" style="display:inline-block;width:8px;height:8px;background:var(--accent2);border-radius:50%;animation:pulse 1.5s ease-in-out infinite;margin-right:5px;"></span>now playing</span>`
+        : `<span style="color:var(--muted)">last played</span>`;
+
+      widget.innerHTML = `
+        <a href="${data.songUrl}" target="_blank" style="display:flex;gap:12px;align-items:center;text-decoration:none;">
+          <img src="${data.albumArt}" alt="album art"
+            style="width:160px;height:160px;border:2px solid var(--border);flex-shrink:0;image-rendering:auto;" />
+          <div style="overflow:hidden;">
+            <div style="font-family:'Press Start 2P',monospace;font-size:8px;color:var(--accent1);white-space:nowraw;overflow:hidden;text-overflow:ellipsis;margin-bottom:5px;">${escapeHTML(data.title)}</div>
+            <div style="font-family:VT323,monospace;font-size:16px;color:var(--text);white-space:nowraw;overflow:hidden;text-overflow:ellipsis;">${escapeHTML(data.artist)}</div>
+            <div style="font-family:VT323,monospace;font-size:14px;color:var(--muted);white-space:nowraw;owerflow:hidden;text-overflow:ellipsis;">${escapeHTML(data.album)}</div>
+            <div style="margin-top:5px;font-family:VT323,monospace;font-size:14px;">${statusLabel}</div>
+          </div>
+        </a>
+        <div class="marquee-wrap" style="margin-top:10px;">
+          <span class="marquee-inner">♪ ${escapeHTML(data.title)} — ${escapeHTML(data.artist)} ♪ ──── ♪ ${escapeHTML(data.title)} — ${escapeHTML(data.artist)} ♪</span>
+        </div>
+      `;
+    } catch (e) {
+      widget.innerHTML = `<div style="font-family:VT323,monospace;font-size:16px;color:var(--muted);">spotify offline 🔇</div>`;
+    }
+  }
+
+  fetchNowPlaying();
+  setInterval(fetchNowPlaying, 30000); // refresh every 30s
+
+  // ─── INIT ────────────────────────────────────────────────────
+  renderPosts();
+  renderGuestbook();
+
+  // Enter key to post
+  document.getElementById('postInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && e.ctrlKey) addPost();
+  });
+</script>
+</body>
+</html>
