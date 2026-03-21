@@ -430,7 +430,7 @@
     .mood-row:last-child { border-bottom: none; }
     .mood-val { color: var(--accent2); }
 
-    /* ── GUESTBOOL ── */
+    /* ── GUESTBOOK ── */
     .guestbook-entry {
       border-bottom: 1px dashed #333355;
       padding: 10px 0;
@@ -479,6 +479,12 @@
     .page { display: none; }
     .page.active { display: block; }
 
+    /* ── GLOBAL OVERFLOW FIX ── */
+    html { overflow-x: hidden; }
+    img { max-width: 100%; height: auto; }
+    .post-content { overflow-wrap: break-word; word-break: break-word; }
+    .gb-msg { overflow-wrap: break-word; word-break: break-word; }
+
     /* ── RESPONSIVE ── */
     @media (max-width: 620px) {
       .grid { grid-template-columns: 1fr; }
@@ -487,6 +493,10 @@
       .status-bar { gap: 10px; font-size: 16px; }
       nav a { font-size: 7px; padding: 10px 3px; }
       .digit { width: 20px; height: 26px; font-size: 11px; }
+      .post-form-row { flex-direction: column; }
+      .post-form input[type="text"] { width: 100%; min-width: unset; }
+      .panel { max-width: 100%; }
+      .site-wrapper { width: 100%; }
     }
     @media (max-width: 420px) {
       .site-wrapper { padding: 12px 10px 40px; }
@@ -497,6 +507,8 @@
       .panel-header { font-size: 7px; }
       .btn { font-size: 7px; padding: 8px 10px; }
       .stat-num { font-size: 10px; }
+      .post-form-row { flex-direction: column; }
+      .post-form input[type="text"] { width: 100%; min-width: unset; }
     }
   </style>
 </head>
@@ -664,7 +676,7 @@
             <div class="excuse-tag">need a reason to disappear? we got you.</div>
             <div class="excuse-box" id="excuseBox">press the button. receive absolution.</div>
             <div style="text-align:center;">
-              <button class="btn" onclick="generateExcuse()">���� GENERATE EXCUSE</button>
+              <button class="btn" onclick="generateExcuse()">🎲 GENERATE EXCUSE</button>
             </div>
           </div>
         </div>
@@ -754,7 +766,7 @@
   localStorage.setItem('dv_visits', visits);
   renderCounter(visits);
 
-  // ─── INVITE CODES ─────────────────────────────────────────────
+  // ─── INVITE CODES ────────────────────────────────────────────
   const VALID_CODES = [
     'DIVY2026', 'COFFEE404', 'TORONTO99', 'PIXEL001',
     'RETRO777', 'BUGFIXER', 'DEVMODE0', 'STARFIELD',
@@ -984,7 +996,7 @@
       const artSize = window.innerWidth < 420 ? '80px' : '120px';
 
       widget.innerHTML = `
-    <a href="${data.songUrl}" target="_blank" style="display:flex;gap:12px;align-items:flex-start;text-decoration:none;">
+        <a href="${data.songUrl}" target="_blank" style="display:flex;gap:12px;align-items:flex-start;text-decoration:none;">
           <img src="${data.albumArt}" alt="album art"
             style="width:${artSize};height:${artSize};border:2px solid var(--border);flex-shrink:0;image-rendering:auto;" />
           <div style="min-width:0;flex:1;">
