@@ -839,12 +839,12 @@
       container.innerHTML = '<div style="color:var(--muted); font-style:italic;">no posts yet. say something.</div>';
       return;
     }
-    container.innerHTML = posts.map((p, i) => `
+    container.innerHTML = posts.map((p) => `
       <div class="post">
         <div class="post-meta">📌 ${p.date || 'recently'}</div>
         <div class="post-content">${escapeHTML(p.text)}</div>
         ${p.tag ? `<span class="post-tag">#${escapeHTML(p.tag)}</span>` : ''}
-        <button onclick="deletePost(${i})" style="float:right;background:none;border:none;color:#555577;cursor:pointer;font-size:11px;font-family:VT323,monospace;margin-top:4px;">✕ delete</button>
+        ${p.id ? `<button onclick="deletePost('${escapeHTML(p.id)}')" style="float:right;background:none;border:none;color:#555577;cursor:pointer;font-size:11px;font-family:VT323,monospace;margin-top:4px;">✕ delete</button>` : ''}
       </div>
     `).join('');
   }
@@ -897,14 +897,14 @@
     }
   }
 
-  async function deletePost(i) {
+  async function deletePost(id) {
     const code = prompt('enter invite code to delete:');
     if (!code) return;
     try {
       const res = await fetch('/api/posts', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ index: i, code })
+        body: JSON.stringify({ id, code })
       });
       const data = await res.json();
       if (res.ok) renderPosts(data.posts);
