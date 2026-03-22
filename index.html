@@ -370,8 +370,10 @@
       transition: color 0.2s;
     }
     .links-list a:hover { color: var(--accent1); }
-    .links-list .link-icon { font-size: 20px; width: 24px; text-align: center; }
+    .links-list a:hover .px-icon { filter: brightness(1.4); }
+    .links-list .link-icon { width: 32px; height: 32px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
     .links-list .link-desc { color: var(--muted); font-size: 12px; display: block; }
+    .px-icon { image-rendering: pixelated; display: block; }
 
     /* ── VISITOR COUNTER ── */
     .visitor-counter {
@@ -618,7 +620,26 @@
             <ul class="links-list">
               <li>
                 <a href="https://github.com/dvyrj08" target="_blank">
-                  <span class="link-icon">🐙</span>
+                  <span class="link-icon">
+                    <!-- GitHub pixel art -->
+                    <svg class="px-icon" width="32" height="32" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="5" y="0" width="6" height="1" fill="#cc99ff"/>
+                      <rect x="3" y="1" width="2" height="1" fill="#cc99ff"/><rect x="11" y="1" width="2" height="1" fill="#cc99ff"/>
+                      <rect x="2" y="2" width="1" height="1" fill="#cc99ff"/><rect x="13" y="2" width="1" height="1" fill="#cc99ff"/>
+                      <rect x="1" y="3" width="1" height="5" fill="#cc99ff"/><rect x="14" y="3" width="1" height="5" fill="#cc99ff"/>
+                      <rect x="2" y="3" width="12" height="1" fill="#cc99ff"/>
+                      <rect x="2" y="7" width="12" height="1" fill="#cc99ff"/>
+                      <rect x="2" y="8" width="5" height="1" fill="#cc99ff"/><rect x="9" y="8" width="5" height="1" fill="#cc99ff"/>
+                      <rect x="2" y="9" width="4" height="1" fill="#cc99ff"/><rect x="10" y="9" width="4" height="1" fill="#cc99ff"/>
+                      <rect x="2" y="10" width="3" height="1" fill="#cc99ff"/><rect x="11" y="10" width="3" height="1" fill="#cc99ff"/>
+                      <rect x="2" y="11" width="3" height="1" fill="#cc99ff"/><rect x="11" y="11" width="3" height="1" fill="#cc99ff"/>
+                      <rect x="3" y="12" width="3" height="1" fill="#cc99ff"/><rect x="10" y="12" width="3" height="1" fill="#cc99ff"/>
+                      <rect x="5" y="13" width="6" height="1" fill="#cc99ff"/>
+                      <rect x="6" y="9" width="4" height="3" fill="#cc99ff"/>
+                      <rect x="7" y="12" width="2" height="1" fill="#cc99ff"/>
+                      <rect x="7" y="13" width="2" height="2" fill="#cc99ff"/>
+                    </svg>
+                  </span>
                   <span>
                     github
                     <span class="link-desc">where the code actually lives</span>
@@ -626,17 +647,58 @@
                 </a>
               </li>
               <li>
-                <a href="https://twitter.com/" target="_blank">
-                  <span class="link-icon">🐦</span>
+                <a href="https://instagram.com/dvyrj" target="_blank">
+                  <span class="link-icon">
+                    <!-- Instagram pixel art -->
+                    <svg class="px-icon" width="32" height="32" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="2" y="2" width="12" height="12" fill="none" stroke="#cc99ff" stroke-width="0"/>
+                      <rect x="2" y="2" width="12" height="1" fill="#cc99ff"/>
+                      <rect x="2" y="13" width="12" height="1" fill="#cc99ff"/>
+                      <rect x="2" y="3" width="1" height="10" fill="#cc99ff"/>
+                      <rect x="13" y="3" width="1" height="10" fill="#cc99ff"/>
+                      <rect x="3" y="4" width="10" height="8" fill="none"/>
+                      <!-- Rounded corners -->
+                      <rect x="3" y="3" width="1" height="1" fill="#0d0d1a"/>
+                      <rect x="12" y="3" width="1" height="1" fill="#0d0d1a"/>
+                      <rect x="3" y="12" width="1" height="1" fill="#0d0d1a"/>
+                      <rect x="12" y="12" width="1" height="1" fill="#0d0d1a"/>
+                      <!-- Camera circle -->
+                      <rect x="5" y="6" width="6" height="5" fill="#cc99ff" rx="0"/>
+                      <rect x="6" y="5" width="4" height="7" fill="#cc99ff"/>
+                      <rect x="5" y="7" width="6" height="3" fill="#cc99ff"/>
+                      <!-- Inner circle cutout -->
+                      <rect x="6" y="7" width="4" height="3" fill="#0d0d1a"/>
+                      <rect x="7" y="6" width="2" height="5" fill="#0d0d1a"/>
+                      <!-- Center dot -->
+                      <rect x="7" y="7" width="2" height="3" fill="#cc99ff"/>
+                      <rect x="6" y="8" width="4" height="1" fill="#cc99ff"/>
+                      <!-- Flash dot -->
+                      <rect x="11" y="4" width="2" height="2" fill="#cc99ff"/>
+                    </svg>
+                  </span>
                   <span>
-                    twitter / x
-                    <span class="link-desc">hot takes and retweets</span>
+                    instagram
+                    <span class="link-desc">@dvyrj</span>
                   </span>
                 </a>
               </li>
               <li>
-                <a href="https://linkedin.com/" target="_blank">
-                  <span class="link-icon">💼</span>
+                <a href="https://linkedin.com/in/dvyrj08" target="_blank">
+                  <span class="link-icon">
+                    <!-- LinkedIn pixel art -->
+                    <svg class="px-icon" width="32" height="32" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="1" y="1" width="14" height="14" fill="#cc99ff"/>
+                      <rect x="2" y="2" width="12" height="12" fill="#0d0d1a"/>
+                      <!-- "in" letters -->
+                      <rect x="3" y="4" width="2" height="8" fill="#cc99ff"/>
+                      <rect x="3" y="3" width="2" height="2" fill="#cc99ff"/>
+                      <rect x="6" y="6" width="2" height="6" fill="#cc99ff"/>
+                      <rect x="8" y="7" width="1" height="1" fill="#cc99ff"/>
+                      <rect x="9" y="6" width="2" height="1" fill="#cc99ff"/>
+                      <rect x="11" y="7" width="1" height="5" fill="#cc99ff"/>
+                      <rect x="9" y="7" width="2" height="5" fill="#cc99ff"/>
+                    </svg>
+                  </span>
                   <span>
                     linkedin
                     <span class="link-desc">professional facade</span>
@@ -645,7 +707,25 @@
               </li>
               <li>
                 <a href="mailto:divy9586@gmail.com">
-                  <span class="link-icon">📧</span>
+                  <span class="link-icon">
+                    <!-- Email pixel art -->
+                    <svg class="px-icon" width="32" height="32" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="1" y="3" width="14" height="10" fill="#cc99ff"/>
+                      <rect x="2" y="4" width="12" height="8" fill="#0d0d1a"/>
+                      <!-- Envelope flap -->
+                      <rect x="2" y="4" width="1" height="1" fill="#cc99ff"/>
+                      <rect x="3" y="5" width="1" height="1" fill="#cc99ff"/>
+                      <rect x="4" y="6" width="1" height="1" fill="#cc99ff"/>
+                      <rect x="5" y="7" width="1" height="1" fill="#cc99ff"/>
+                      <rect x="6" y="8" width="1" height="1" fill="#cc99ff"/>
+                      <rect x="7" y="9" width="2" height="1" fill="#cc99ff"/>
+                      <rect x="9" y="8" width="1" height="1" fill="#cc99ff"/>
+                      <rect x="10" y="7" width="1" height="1" fill="#cc99ff"/>
+                      <rect x="11" y="6" width="1" height="1" fill="#cc99ff"/>
+                      <rect x="12" y="5" width="1" height="1" fill="#cc99ff"/>
+                      <rect x="13" y="4" width="1" height="1" fill="#cc99ff"/>
+                    </svg>
+                  </span>
                   <span>
                     email
                     <span class="link-desc">divy9586@gmail.com</span>
@@ -660,12 +740,7 @@
         <div class="panel">
           <div class="panel-header"><span class="icon">📖</span> GUESTBOOK</div>
           <div class="panel-body">
-            <div id="guestbook">
-              <div class="guestbook-entry">
-                <div class="gb-name">anonymous visitor</div>
-                <div class="gb-msg">sick page dude 🔥</div>
-              </div>
-            </div>
+            <div id="guestbook"></div>
             <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
               <input type="text" id="gbName" placeholder="your name" style="background:#0a0a18;border:1px solid #333355;color:var(--text);font-family:Courier Prime,monospace;font-size:13px;padding:7px 10px;outline:none;flex:1;min-width:80px;" />
               <input type="text" id="gbMsg" placeholder="leave a message" style="background:#0a0a18;border:1px solid #333355;color:var(--text);font-family:Courier Prime,monospace;font-size:13px;padding:7px 10px;outline:none;flex:2;min-width:100px;" />
@@ -769,49 +844,18 @@
       el.appendChild(d);
     }
   }
-  let visits = parseInt(localStorage.getItem('dv_visits') || '1336', 10) + 1;
-  localStorage.setItem('dv_visits', visits);
+  let visits;
+  if (!sessionStorage.getItem('dv_counted')) {
+    visits = parseInt(localStorage.getItem('dv_visits') || '1336', 10) + 1;
+    localStorage.setItem('dv_visits', visits);
+    sessionStorage.setItem('dv_counted', '1');
+  } else {
+    visits = parseInt(localStorage.getItem('dv_visits') || '1337', 10);
+  }
   renderCounter(visits);
 
-  // ─── INVITE CODES ────────────────────────────────────────────
-  const VALID_CODES = [
-    'DIVY2026', 'COFFEE404', 'TORONTO99', 'PIXEL001',
-    'RETRO777', 'BUGFIXER', 'DEVMODE0', 'STARFIELD',
-    'PURPLEHZ', 'NEON2026', 'HACKTIME', 'BUILDSZN'
-  ];
-
-  function isValidCode(code) {
-    const upper = code.toUpperCase().trim();
-    if (!VALID_CODES.includes(upper)) return false;
-    const used = JSON.parse(localStorage.getItem('dv_used_codes') || '[]');
-    return !used.includes(upper);
-  }
-
-  function markCodeUsed(code) {
-    const upper = code.toUpperCase().trim();
-    const used = JSON.parse(localStorage.getItem('dv_used_codes') || '[]');
-    used.push(upper);
-    localStorage.setItem('dv_used_codes', JSON.stringify(used));
-  }
-
-  // ─── POSTS ───────────────────────────────────────────────────
-  const defaultPosts = [
-    { text: "why does CSS work perfectly in my head and nowhere else", tag: "dev", date: "mar 20" },
-    { text: "toronto in march is just november with better propaganda", tag: "life", date: "mar 19" },
-    { text: "built something cool today. it broke by end of day. classic.", tag: "dev", date: "mar 18" },
-  ];
-
-  function loadPosts() {
-    const stored = localStorage.getItem('dv_posts');
-    return stored ? JSON.parse(stored) : defaultPosts;
-  }
-
-  function savePosts(posts) {
-    localStorage.setItem('dv_posts', JSON.stringify(posts));
-  }
-
-  function renderPosts() {
-    const posts = loadPosts();
+  // ─── POSTS (cross-device via API) ────────────────────────────
+  function renderPosts(posts) {
     const container = document.getElementById('feedContainer');
     document.getElementById('postCount').textContent = posts.length;
     if (!posts.length) {
@@ -828,55 +872,73 @@
     `).join('');
   }
 
-  function addPost() {
+  async function loadAndRenderPosts() {
+    const container = document.getElementById('feedContainer');
+    container.innerHTML = '<div style="color:var(--muted);font-style:italic;">loading...</div>';
+    try {
+      const res = await fetch('/api/posts');
+      const posts = await res.json();
+      renderPosts(posts);
+    } catch (e) {
+      container.innerHTML = '<div style="color:#ff4444;font-style:italic;">failed to load posts.</div>';
+    }
+  }
+
+  async function addPost() {
     const text = document.getElementById('postInput').value.trim();
     const tag = document.getElementById('tagInput').value.trim();
     const code = document.getElementById('inviteCodeInput').value.trim();
     const errEl = document.getElementById('postError');
 
     if (!text) return;
-
     if (!code) {
       errEl.textContent = '⚠ invite code required to post.';
       errEl.style.display = 'block';
       return;
     }
 
-    if (!isValidCode(code)) {
-      errEl.textContent = '✕ invalid or already used code.';
-      errEl.style.display = 'block';
-      return;
-    }
-
     errEl.style.display = 'none';
-    markCodeUsed(code);
-
-    const posts = loadPosts();
-    const now = new Date();
-    const date = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    posts.unshift({ text, tag, date });
-    savePosts(posts);
-    document.getElementById('postInput').value = '';
-    document.getElementById('tagInput').value = '';
-    document.getElementById('inviteCodeInput').value = '';
-    renderPosts();
+    try {
+      const res = await fetch('/api/posts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, tag, code }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        errEl.textContent = '✕ ' + data.error;
+        errEl.style.display = 'block';
+        return;
+      }
+      document.getElementById('postInput').value = '';
+      document.getElementById('tagInput').value = '';
+      document.getElementById('inviteCodeInput').value = '';
+      renderPosts(data.posts);
+    } catch (e) {
+      errEl.textContent = '✕ failed to post. try again.';
+      errEl.style.display = 'block';
+    }
   }
 
-  function deletePost(i) {
-    const posts = loadPosts();
-    posts.splice(i, 1);
-    savePosts(posts);
-    renderPosts();
+  async function deletePost(i) {
+    const code = prompt('enter an invite code to delete:');
+    if (!code) return;
+    try {
+      const res = await fetch('/api/posts', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ index: i, code }),
+      });
+      const data = await res.json();
+      if (!res.ok) { alert(data.error); return; }
+      renderPosts(data.posts);
+    } catch (e) {
+      alert('failed to delete. try again.');
+    }
   }
 
-  // ─── GUESTBOOK ───────────────────────────────────────────────
-  function loadGuests() {
-    const stored = localStorage.getItem('dv_guests');
-    return stored ? JSON.parse(stored) : [{ name: 'anonymous visitor', msg: 'sick page dude 🔥' }];
-  }
-
-  function renderGuestbook() {
-    const entries = loadGuests();
+  // ─── GUESTBOOK (cross-device via API) ────────────────────────
+  function renderGuestbook(entries) {
     document.getElementById('guestbook').innerHTML = entries.map(e => `
       <div class="guestbook-entry">
         <div class="gb-name">${escapeHTML(e.name)}</div>
@@ -885,16 +947,34 @@
     `).join('');
   }
 
-  function addGuestbookEntry() {
+  async function loadAndRenderGuestbook() {
+    try {
+      const res = await fetch('/api/guestbook');
+      const entries = await res.json();
+      renderGuestbook(entries);
+    } catch (e) {
+      document.getElementById('guestbook').innerHTML = '<div style="color:#ff4444;font-style:italic;">failed to load guestbook.</div>';
+    }
+  }
+
+  async function addGuestbookEntry() {
     const name = document.getElementById('gbName').value.trim() || 'anonymous';
     const msg = document.getElementById('gbMsg').value.trim();
     if (!msg) return;
-    const entries = loadGuests();
-    entries.unshift({ name, msg });
-    localStorage.setItem('dv_guests', JSON.stringify(entries));
-    document.getElementById('gbName').value = '';
-    document.getElementById('gbMsg').value = '';
-    renderGuestbook();
+    try {
+      const res = await fetch('/api/guestbook', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, msg }),
+      });
+      const data = await res.json();
+      if (!res.ok) { alert(data.error); return; }
+      document.getElementById('gbName').value = '';
+      document.getElementById('gbMsg').value = '';
+      renderGuestbook(data.entries);
+    } catch (e) {
+      alert('failed to sign guestbook. try again.');
+    }
   }
 
   // ─── EXCUSE GENERATOR ────────────────────────────────────────
@@ -1002,10 +1082,13 @@
       // album art responsive size
       const artSize = window.innerWidth < 420 ? '80px' : '120px';
 
+      const artHTML = data.albumArt
+        ? `<img src="${data.albumArt}" alt="album art" style="width:${artSize};height:${artSize};border:2px solid var(--border);flex-shrink:0;image-rendering:auto;" />`
+        : `<div style="width:${artSize};height:${artSize};border:2px solid var(--border);background:#1a0a2a;display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0;">🎵</div>`;
+
       widget.innerHTML = `
         <a href="${data.songUrl}" target="_blank" style="display:flex;gap:12px;align-items:flex-start;text-decoration:none;">
-          <img src="${data.albumArt}" alt="album art"
-            style="width:${artSize};height:${artSize};border:2px solid var(--border);flex-shrink:0;image-rendering:auto;" />
+          ${artHTML}
           <div style="min-width:0;flex:1;">
             <div style="font-family:'Press Start 2P',monospace;font-size:10px;color:var(--accent1);line-height:1.5;word-break:break-word;margin-bottom:6px;">${escapeHTML(data.title)}</div>
             <div style="font-family:VT323,monospace;font-size:15px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHTML(data.artist)}</div>
@@ -1029,8 +1112,8 @@
   setInterval(fetchNowPlaying, 4000); // poll every 4s for near-live updates
 
   // ─── INIT ────────────────────────────────────────────────────
-  renderPosts();
-  renderGuestbook();
+  loadAndRenderPosts();
+  loadAndRenderGuestbook();
 
   document.getElementById('postInput').addEventListener('keydown', e => {
     if (e.key === 'Enter' && e.ctrlKey) addPost();
