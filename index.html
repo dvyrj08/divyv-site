@@ -303,6 +303,59 @@
     .btn:active { transform: scale(0.97); }
 
     /* ── ABOUT ── */
+    .hologram-wrap {
+      float: left;
+      margin: 0 16px 8px 0;
+      perspective: 600px;
+      flex-shrink: 0;
+      width: 90px;
+    }
+    .hologram-inner {
+      position: relative;
+      width: 90px;
+      height: 115px;
+      animation: holo-rotate 8s linear infinite;
+      transform-style: preserve-3d;
+    }
+    .hologram-inner img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      border: 1px solid cyan;
+      border-radius: 2px;
+      filter: brightness(0.7) contrast(1.3) saturate(0) sepia(1) hue-rotate(160deg) brightness(1.3);
+      display: block;
+    }
+    .hologram-inner::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,255,255,0.06) 2px,
+        rgba(0,255,255,0.06) 4px
+      );
+      pointer-events: none;
+      animation: scanlines 1.5s linear infinite;
+    }
+    .hologram-glow {
+      position: absolute;
+      inset: -4px;
+      box-shadow: 0 0 10px cyan, 0 0 24px rgba(0,255,255,0.5), inset 0 0 8px rgba(0,255,255,0.15);
+      border-radius: 4px;
+      pointer-events: none;
+    }
+    @keyframes holo-rotate {
+      0%   { transform: rotateY(0deg); }
+      100% { transform: rotateY(360deg); }
+    }
+    @keyframes scanlines {
+      0%   { background-position: 0 0; }
+      100% { background-position: 0 100px; }
+    }
     .about-avatar {
       width: 72px; height: 72px;
       border: 3px solid var(--accent1);
@@ -586,7 +639,12 @@
           <div class="panel-header"><span class="icon">👾</span> ABOUT ME</div>
           <div class="panel-body">
             <div class="about-text">
-              <div class="about-avatar">👾</div>
+              <div class="hologram-wrap">
+                <div class="hologram-inner">
+                  <img src="/g2-front-divy_1.jpg" alt="divy" />
+                  <div class="hologram-glow"></div>
+                </div>
+              </div>
               <div class="about-name">divy</div>
               hey — i'm divy. 24, based in toronto. i write code for a living and think too much about everything else.<br><br>
               early career dev figuring it out. currently grinding through whatever problem is on my screen. sometimes that problem is the code, sometimes it's me.<br><br>
