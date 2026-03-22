@@ -1,8 +1,19 @@
-import { kv } from '@vercel/kv';
+import Redis from 'ioredis';
+
+const redis = new Redis(process.env.REDIS_URL);
 
 const DEFAULT_GUESTS = [
   { name: 'anonymous visitor', msg: 'sick page dude 🔥' }
 ];
+
+async function getGuests() {
+  const data = await redis.get('dv_guests');
+  return data ? JSON.parse(data) : DEFAULT_GUESTS;
+}
+
+async function setGuests(entries) {
+  await redis.set('dv_guests', JSON.stringify(entries));
+}
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -13,8 +24,8 @@ export default async function handler(req, res) {
 
   // GET — return all entries
   if (req.method === 'GET') {
-    const entries = await kv.get('dv_guests');
-    return res.status(200).json(entries || DEFAULT_GUESTS);
+    const entries = await getGuests();
+    return res.status(200).json(entries);
   }
 
   // POST — add a new entry
@@ -25,12 +36,12 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Message is required.' });
     }
 
-    const entries = (await kv.get('dv_guests')) || DEFAULT_GUESTS;
+    const entries = await getGuests();
     entries.unshift({
       name: (name && name.trim()) ? name.trim() : 'anonymous',
       msg: msg.trim()
     });
-    await kv.set('dv_guests', entries);
+    await setGuests(entries);
 
     return res.status(200).json({ ok: true, entries });
   }

@@ -1,4 +1,6 @@
-import { kv } from '@vercel/kv';
+import Redis from 'ioredis';
+
+const redis = new Redis(process.env.REDIS_URL);
 
 const VALID_CODES = [
   'DIVY2026', 'COFFEE404', 'TORONTO99', 'PIXEL001',
@@ -12,6 +14,24 @@ const DEFAULT_POSTS = [
   { text: "built something cool today. it broke by end of day. classic.", tag: "dev", date: "mar 18" },
 ];
 
+async function getPosts() {
+  const data = await redis.get('dv_posts');
+  return data ? JSON.parse(data) : DEFAULT_POSTS;
+}
+
+async function setPosts(posts) {
+  await redis.set('dv_posts', JSON.stringify(posts));
+}
+
+async function getUsedCodes() {
+  const data = await redis.get('dv_used_codes');
+  return data ? JSON.parse(data) : [];
+}
+
+async function setUsedCodes(codes) {
+  await redis.set('dv_used_codes', JSON.stringify(codes));
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
@@ -21,8 +41,8 @@ export default async function handler(req, res) {
 
   // GET — return all posts
   if (req.method === 'GET') {
-    const posts = await kv.get('dv_posts');
-    return res.status(200).json(posts || DEFAULT_POSTS);
+    const posts = await getPosts();
+    return res.status(200).json(posts);
   }
 
   // POST — add a new post
@@ -41,20 +61,19 @@ export default async function handler(req, res) {
       return res.status(403).json({ error: 'Invalid or already used code.' });
     }
 
-    const usedCodes = (await kv.get('dv_used_codes')) || [];
+    const usedCodes = await getUsedCodes();
     if (usedCodes.includes(upper)) {
       return res.status(403).json({ error: 'Invalid or already used code.' });
     }
 
-    // Mark code as used
     usedCodes.push(upper);
-    await kv.set('dv_used_codes', usedCodes);
+    await setUsedCodes(usedCodes);
 
-    const posts = (await kv.get('dv_posts')) || DEFAULT_POSTS;
+    const posts = await getPosts();
     const now = new Date();
     const date = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     posts.unshift({ text: text.trim(), tag: tag ? tag.trim() : '', date });
-    await kv.set('dv_posts', posts);
+    await setPosts(posts);
 
     return res.status(200).json({ ok: true, posts });
   }
@@ -75,12 +94,12 @@ export default async function handler(req, res) {
       return res.status(403).json({ error: 'Invalid code.' });
     }
 
-    const posts = (await kv.get('dv_posts')) || DEFAULT_POSTS;
+    const posts = await getPosts();
     if (index < 0 || index >= posts.length) {
       return res.status(400).json({ error: 'Invalid index.' });
     }
     posts.splice(index, 1);
-    await kv.set('dv_posts', posts);
+    await setPosts(posts);
 
     return res.status(200).json({ ok: true, posts });
   }
