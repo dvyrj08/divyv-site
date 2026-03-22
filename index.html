@@ -750,7 +750,7 @@
     starsEl.appendChild(s);
   }
 
-  // ─── VISITOR COUNTER ─────────────────────────────────────────
+  // ─── VISITOR COUNTER ────────────────────────────────────────
   function renderCounter(n) {
     const s = String(n).padStart(7, '0');
     const el = document.getElementById('counterDigits');
@@ -1007,7 +1007,7 @@
           </div>
         </a>
         <div class="marquee-wrap" style="margin-top:10px;">
-          <span class="marquee-inner" style="animation:marquee ${marqueeDuration}s linear infinite;">${escapeHTML(marqueeText)}</span>
+          <span class="marquee-inner" style="animation:marquee ${marqueeDuration}s linear -${(marqueeDuration * 0.5).toFixed(1)}s infinite;">${escapeHTML(marqueeText)}</span>
         </div>
       `;
     } catch (e) {
