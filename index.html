@@ -773,45 +773,8 @@
   localStorage.setItem('dv_visits', visits);
   renderCounter(visits);
 
-  // ─── INVITE CODES ────────────────────────────────────────────
-  const VALID_CODES = [
-    'DIVY2026', 'COFFEE404', 'TORONTO99', 'PIXEL001',
-    'RETRO777', 'BUGFIXER', 'DEVMODE0', 'STARFIELD',
-    'PURPLEHZ', 'NEON2026', 'HACKTIME', 'BUILDSZN'
-  ];
-
-  function isValidCode(code) {
-    const upper = code.toUpperCase().trim();
-    if (!VALID_CODES.includes(upper)) return false;
-    const used = JSON.parse(localStorage.getItem('dv_used_codes') || '[]');
-    return !used.includes(upper);
-  }
-
-  function markCodeUsed(code) {
-    const upper = code.toUpperCase().trim();
-    const used = JSON.parse(localStorage.getItem('dv_used_codes') || '[]');
-    used.push(upper);
-    localStorage.setItem('dv_used_codes', JSON.stringify(used));
-  }
-
   // ─── POSTS ───────────────────────────────────────────────────
-  const defaultPosts = [
-    { text: "why does CSS work perfectly in my head and nowhere else", tag: "dev", date: "mar 20" },
-    { text: "toronto in march is just november with better propaganda", tag: "life", date: "mar 19" },
-    { text: "built something cool today. it broke by end of day. classic.", tag: "dev", date: "mar 18" },
-  ];
-
-  function loadPosts() {
-    const stored = localStorage.getItem('dv_posts');
-    return stored ? JSON.parse(stored) : defaultPosts;
-  }
-
-  function savePosts(posts) {
-    localStorage.setItem('dv_posts', JSON.stringify(posts));
-  }
-
-  function renderPosts() {
-    const posts = loadPosts();
+  function renderPosts(posts) {
     const container = document.getElementById('feedContainer');
     document.getElementById('postCount').textContent = posts.length;
     if (!posts.length) {
@@ -828,55 +791,73 @@
     `).join('');
   }
 
-  function addPost() {
+  async function loadPosts() {
+    try {
+      const res = await fetch('/api/posts');
+      const posts = await res.json();
+      renderPosts(posts);
+    } catch (e) {
+      document.getElementById('feedContainer').innerHTML =
+        '<div style="color:var(--muted);font-style:italic;">couldn\'t load posts.</div>';
+    }
+  }
+
+  async function addPost() {
     const text = document.getElementById('postInput').value.trim();
     const tag = document.getElementById('tagInput').value.trim();
     const code = document.getElementById('inviteCodeInput').value.trim();
     const errEl = document.getElementById('postError');
 
     if (!text) return;
-
     if (!code) {
       errEl.textContent = '⚠ invite code required to post.';
       errEl.style.display = 'block';
       return;
     }
 
-    if (!isValidCode(code)) {
-      errEl.textContent = '✕ invalid or already used code.';
-      errEl.style.display = 'block';
-      return;
-    }
-
     errEl.style.display = 'none';
-    markCodeUsed(code);
 
-    const posts = loadPosts();
-    const now = new Date();
-    const date = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    posts.unshift({ text, tag, date });
-    savePosts(posts);
-    document.getElementById('postInput').value = '';
-    document.getElementById('tagInput').value = '';
-    document.getElementById('inviteCodeInput').value = '';
-    renderPosts();
+    try {
+      const res = await fetch('/api/posts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, tag, code })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        errEl.textContent = '✕ ' + (data.error || 'invalid or already used code.');
+        errEl.style.display = 'block';
+        return;
+      }
+      document.getElementById('postInput').value = '';
+      document.getElementById('tagInput').value = '';
+      document.getElementById('inviteCodeInput').value = '';
+      renderPosts(data.posts);
+    } catch (e) {
+      errEl.textContent = '✕ something went wrong. try again.';
+      errEl.style.display = 'block';
+    }
   }
 
-  function deletePost(i) {
-    const posts = loadPosts();
-    posts.splice(i, 1);
-    savePosts(posts);
-    renderPosts();
+  async function deletePost(i) {
+    const code = prompt('enter invite code to delete:');
+    if (!code) return;
+    try {
+      const res = await fetch('/api/posts', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ index: i, code })
+      });
+      const data = await res.json();
+      if (res.ok) renderPosts(data.posts);
+      else alert(data.error || 'invalid code');
+    } catch (e) {
+      alert('something went wrong.');
+    }
   }
 
   // ─── GUESTBOOK ───────────────────────────────────────────────
-  function loadGuests() {
-    const stored = localStorage.getItem('dv_guests');
-    return stored ? JSON.parse(stored) : [{ name: 'anonymous visitor', msg: 'sick page dude 🔥' }];
-  }
-
-  function renderGuestbook() {
-    const entries = loadGuests();
+  function renderGuestbook(entries) {
     document.getElementById('guestbook').innerHTML = entries.map(e => `
       <div class="guestbook-entry">
         <div class="gb-name">${escapeHTML(e.name)}</div>
@@ -885,16 +866,36 @@
     `).join('');
   }
 
-  function addGuestbookEntry() {
+  async function loadGuests() {
+    try {
+      const res = await fetch('/api/guestbook');
+      const entries = await res.json();
+      renderGuestbook(entries);
+    } catch (e) {
+      document.getElementById('guestbook').innerHTML =
+        '<div style="color:var(--muted);font-style:italic;">couldn\'t load guestbook.</div>';
+    }
+  }
+
+  async function addGuestbookEntry() {
     const name = document.getElementById('gbName').value.trim() || 'anonymous';
     const msg = document.getElementById('gbMsg').value.trim();
     if (!msg) return;
-    const entries = loadGuests();
-    entries.unshift({ name, msg });
-    localStorage.setItem('dv_guests', JSON.stringify(entries));
-    document.getElementById('gbName').value = '';
-    document.getElementById('gbMsg').value = '';
-    renderGuestbook();
+    try {
+      const res = await fetch('/api/guestbook', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, msg })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        document.getElementById('gbName').value = '';
+        document.getElementById('gbMsg').value = '';
+        renderGuestbook(data.entries);
+      }
+    } catch (e) {
+      // silent fail
+    }
   }
 
   // ─── EXCUSE GENERATOR ────────────────────────────────────────
@@ -1029,8 +1030,8 @@
   setInterval(fetchNowPlaying, 4000); // poll every 4s for near-live updates
 
   // ─── INIT ────────────────────────────────────────────────────
-  renderPosts();
-  renderGuestbook();
+  loadPosts();
+  loadGuests();
 
   document.getElementById('postInput').addEventListener('keydown', e => {
     if (e.key === 'Enter' && e.ctrlKey) addPost();
