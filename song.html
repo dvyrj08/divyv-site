@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>shared song — divy's page</title>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:      #0d0d1a;
+      --panel:   #12122a;
+      --border:  #6633cc;
+      --accent1: #ff66ff;
+      --accent2: #33ffcc;
+      --accent3: #ffcc00;
+      --text:    #e0e0f0;
+      --muted:   #9999bb;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'VT323', monospace;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+    }
+
+    /* starfield */
+    #stars { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+    .star {
+      position: absolute; width: 2px; height: 2px;
+      background: white; border-radius: 50%;
+      animation: twinkle var(--d, 3s) ease-in-out infinite;
+      opacity: var(--o, 0.5);
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: var(--o, 0.5); }
+      50% { opacity: 0.1; }
+    }
+
+    /* rainbow bar */
+    .rainbow-bar {
+      position: fixed; top: 0; left: 0; right: 0; height: 4px; z-index: 10;
+      background: linear-gradient(90deg, #ff66ff, #6633cc, #33ffcc, #ffcc00, #ff66ff);
+      background-size: 200%;
+      animation: shimmer 3s linear infinite;
+    }
+    @keyframes shimmer {
+      0%   { background-position: 0%; }
+      100% { background-position: 200%; }
+    }
+
+    /* card */
+    .card {
+      position: relative; z-index: 1;
+      width: 100%; max-width: 480px;
+      margin: 48px 16px;
+      border: 2px solid var(--border);
+      background: var(--panel);
+      padding: 32px 28px 28px;
+      text-align: center;
+    }
+    .card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 4px;
+      background: linear-gradient(90deg, #ff66ff, #6633cc, #33ffcc, #ffcc00, #ff66ff);
+      background-size: 200%;
+      animation: shimmer 3s linear infinite;
+    }
+
+    /* album art */
+    .album-art-wrap {
+      position: relative; display: inline-block; margin-bottom: 24px;
+    }
+    .album-art {
+      width: 220px; height: 220px; object-fit: cover;
+      border: 3px solid var(--border); display: block;
+    }
+    .album-art-wrap::after {
+      content: '';
+      position: absolute; inset: -6px;
+      border: 1px solid var(--border);
+      box-shadow: 0 0 12px var(--border), 0 0 30px rgba(102,51,204,0.4);
+      pointer-events: none;
+    }
+    .album-art-placeholder {
+      width: 220px; height: 220px;
+      border: 3px solid var(--border); background: #0a0a18;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 64px;
+    }
+
+    /* equalizer bars */
+    .eq-wrap {
+      display: flex; align-items: flex-end; justify-content: center;
+      gap: 5px; height: 32px; margin-bottom: 22px;
+    }
+    .eq-bar {
+      width: 7px; border-radius: 2px 2px 0 0;
+      animation: eq-pulse var(--speed, 0.8s) ease-in-out infinite alternate;
+      transform-origin: bottom;
+    }
+    .eq-bar:nth-child(1) { background: var(--accent1); --speed: 0.6s; --max-h: 24px; }
+    .eq-bar:nth-child(2) { background: var(--accent2); --speed: 0.9s; --max-h: 32px; }
+    .eq-bar:nth-child(3) { background: var(--accent3); --speed: 0.5s; --max-h: 20px; }
+    .eq-bar:nth-child(4) { background: var(--accent2); --speed: 0.75s; --max-h: 28px; }
+    .eq-bar:nth-child(5) { background: var(--accent1); --speed: 0.65s; --max-h: 22px; }
+    @keyframes eq-pulse {
+      from { height: 4px; }
+      to   { height: var(--max-h, 24px); }
+    }
+
+    /* song info */
+    .song-title {
+      font-family: 'Press Start 2P', monospace; font-size: 13px;
+      color: var(--accent1); line-height: 1.8;
+      word-break: break-word; margin-bottom: 12px;
+      text-shadow: 0 0 10px var(--accent1), 0 0 24px #cc00cc;
+    }
+    .song-artist {
+      font-family: 'VT323', monospace; font-size: 24px;
+      color: var(--accent2); margin-bottom: 4px; letter-spacing: 1px;
+    }
+    .song-album {
+      font-family: 'VT323', monospace; font-size: 18px;
+      color: var(--muted); margin-bottom: 28px;
+    }
+
+    /* listen button */
+    .listen-btn {
+      display: inline-block;
+      font-family: 'Press Start 2P', monospace; font-size: 9px;
+      padding: 14px 22px;
+      background: var(--border); color: #fff;
+      text-decoration: none;
+      cursor: pointer; letter-spacing: 1px;
+      transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+      box-shadow: 0 0 12px rgba(102,51,204,0.5);
+    }
+    .listen-btn:hover { background: var(--accent1); box-shadow: 0 0 18px rgba(255,102,255,0.6); }
+    .listen-btn:active { transform: scale(0.97); }
+
+    /* footer */
+    .card-footer {
+      margin-top: 24px;
+      font-family: 'VT323', monospace; font-size: 15px;
+      color: #444466; letter-spacing: 1px;
+    }
+
+    /* not found */
+    .not-found .nf-title {
+      font-family: 'Press Start 2P', monospace; font-size: 12px;
+      color: var(--accent1); margin-bottom: 16px; line-height: 1.8;
+    }
+    .not-found .nf-msg {
+      font-family: 'VT323', monospace; font-size: 20px; color: var(--muted);
+    }
+
+    .loading-msg {
+      font-family: 'VT323', monospace; font-size: 22px;
+      color: var(--muted); letter-spacing: 2px;
+    }
+
+    @media (max-width: 520px) {
+      .card { margin: 60px 12px 24px; padding: 28px 18px 22px; }
+      .album-art, .album-art-placeholder { width: 180px; height: 180px; }
+      .song-title { font-size: 11px; }
+      .listen-btn { font-size: 8px; padding: 12px 18px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="rainbow-bar"></div>
+<div id="stars"></div>
+
+<div class="card" id="card">
+  <div class="loading-msg">loading...</div>
+</div>
+
+<script>
+  // starfield
+  const starsEl = document.getElementById('stars');
+  for (let i = 0; i < 100; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    s.style.setProperty('--d', (2 + Math.random() * 4).toFixed(1) + 's');
+    s.style.setProperty('--o', (0.2 + Math.random() * 0.8).toFixed(2));
+    s.style.left = Math.random() * 100 + '%';
+    s.style.top  = Math.random() * 100 + '%';
+    starsEl.appendChild(s);
+  }
+
+  function escapeHTML(str) {
+    return String(str)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function renderNotFound() {
+    document.getElementById('card').innerHTML = `
+      <div class="not-found">
+        <div class="nf-title">// track not found</div>
+        <div class="nf-msg">this link may have expired<br>or never existed.</div>
+      </div>`;
+  }
+
+  function renderSong(song) {
+    document.title = `${song.title} — ${song.artist} · divy's page`;
+    const artHtml = song.albumArt
+      ? `<img class="album-art" src="${escapeHTML(song.albumArt)}" alt="album art" />`
+      : `<div class="album-art-placeholder">♪</div>`;
+
+    document.getElementById('card').innerHTML = `
+      <div class="album-art-wrap">${artHtml}</div>
+      <div class="eq-wrap" aria-hidden="true">
+        <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
+        <div class="eq-bar"></div><div class="eq-bar"></div>
+      </div>
+      <div class="song-title">${escapeHTML(song.title)}</div>
+      <div class="song-artist">${escapeHTML(song.artist)}</div>
+      ${song.album ? `<div class="song-album">${escapeHTML(song.album)}</div>` : ''}
+      <a class="listen-btn" href="${escapeHTML(song.songUrl)}" target="_blank" rel="noopener noreferrer">▶ LISTEN ON SPOTIFY</a>
+      <div class="card-footer">★ shared via divy's page ★</div>`;
+  }
+
+  async function loadSong() {
+    const id = new URLSearchParams(window.location.search).get('id');
+    if (!id) { renderNotFound(); return; }
+    try {
+      const res = await fetch(`/api/share?id=${encodeURIComponent(id)}`);
+      if (!res.ok) { renderNotFound(); return; }
+      renderSong(await res.json());
+    } catch (e) {
+      renderNotFound();
+    }
+  }
+
+  loadSong();
+</script>
+</body>
+</html>
