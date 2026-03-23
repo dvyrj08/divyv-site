@@ -570,12 +570,101 @@
       .post-form-row { flex-direction: column; }
       .post-form input[type="text"] { width: 100%; min-width: unset; }
     }
+    /* ── DELETE MODAL ── */
+    #delete-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    #delete-modal-overlay.active { display: flex; }
+    #delete-modal {
+      background: var(--panel);
+      border: 2px solid var(--border);
+      padding: 24px 28px;
+      width: 100%;
+      max-width: 360px;
+      font-family: 'VT323', monospace;
+      position: relative;
+    }
+    #delete-modal h3 {
+      font-family: 'VT323', monospace;
+      font-size: 22px;
+      color: var(--accent1);
+      margin-bottom: 12px;
+      letter-spacing: 1px;
+    }
+    #delete-modal label {
+      display: block;
+      font-size: 16px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    #delete-modal-input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'VT323', monospace;
+      font-size: 20px;
+      padding: 8px 10px;
+      outline: none;
+      letter-spacing: 2px;
+    }
+    #delete-modal-input:focus { border-color: var(--accent1); }
+    #delete-modal-error {
+      color: #ff4466;
+      font-size: 15px;
+      min-height: 20px;
+      margin-top: 6px;
+    }
+    #delete-modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    #delete-modal-actions button {
+      flex: 1;
+      font-family: 'VT323', monospace;
+      font-size: 18px;
+      padding: 8px;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      letter-spacing: 1px;
+    }
+    #delete-modal-confirm {
+      background: var(--border);
+      color: #fff;
+    }
+    #delete-modal-confirm:hover { background: var(--accent1); border-color: var(--accent1); }
+    #delete-modal-cancel {
+      background: transparent;
+      color: var(--muted);
+    }
+    #delete-modal-cancel:hover { color: var(--text); }
   </style>
 </head>
 <body>
 
 <!-- Starfield -->
 <div id="stars"></div>
+
+<!-- Delete Modal -->
+<div id="delete-modal-overlay">
+  <div id="delete-modal">
+    <h3>// delete post</h3>
+    <label>enter master code:</label>
+    <input id="delete-modal-input" type="password" autocomplete="off" spellcheck="false" />
+    <div id="delete-modal-error"></div>
+    <div id="delete-modal-actions">
+      <button id="delete-modal-confirm">confirm</button>
+      <button id="delete-modal-cancel">cancel</button>
+    </div>
+  </div>
+</div>
 
 <div class="site-wrapper">
 
@@ -897,21 +986,49 @@
     }
   }
 
-  async function deletePost(id) {
-    const code = prompt('enter master code to delete:');
-    if (!code) return;
-    try {
-      const res = await fetch('/api/posts', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, code })
-      });
-      const data = await res.json();
-      if (res.ok) renderPosts(data.posts);
-      else alert(data.error || 'invalid code');
-    } catch (e) {
-      alert('something went wrong.');
+  function deletePost(id) {
+    const overlay = document.getElementById('delete-modal-overlay');
+    const input = document.getElementById('delete-modal-input');
+    const error = document.getElementById('delete-modal-error');
+    const confirmBtn = document.getElementById('delete-modal-confirm');
+    const cancelBtn = document.getElementById('delete-modal-cancel');
+
+    input.value = '';
+    error.textContent = '';
+    overlay.classList.add('active');
+    input.focus();
+
+    function close() {
+      overlay.classList.remove('active');
+      confirmBtn.replaceWith(confirmBtn.cloneNode(true));
+      cancelBtn.replaceWith(cancelBtn.cloneNode(true));
     }
+
+    document.getElementById('delete-modal-cancel').addEventListener('click', close);
+    overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+
+    document.getElementById('delete-modal-confirm').addEventListener('click', async () => {
+      const code = input.value.trim();
+      if (!code) { error.textContent = 'code required'; return; }
+      error.textContent = '';
+      try {
+        const res = await fetch('/api/posts', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, code })
+        });
+        const data = await res.json();
+        if (res.ok) { close(); renderPosts(data.posts); }
+        else { error.textContent = data.error || 'invalid code'; input.value = ''; input.focus(); }
+      } catch (e) {
+        error.textContent = 'something went wrong.';
+      }
+    });
+
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') document.getElementById('delete-modal-confirm').click();
+      if (e.key === 'Escape') close();
+    });
   }
 
   // ─── GUESTBOOK ───────────────────────────────────────────────
