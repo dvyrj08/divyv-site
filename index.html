@@ -1272,10 +1272,21 @@
       });
       const data = await res.json();
       if (!res.ok || !data.url) { btn.textContent = '♫ SHARE THIS SONG'; btn.disabled = false; return; }
-      await navigator.clipboard.writeText(data.url);
-      btn.textContent = '✓ COPIED!';
-      btn.classList.add('copied');
-      setTimeout(() => { btn.textContent = '♫ SHARE THIS SONG'; btn.classList.remove('copied'); btn.disabled = false; }, 2000);
+      // use native share sheet on mobile (Android/iOS), fall back to clipboard on desktop
+      if (navigator.share) {
+        await navigator.share({
+          title: `${currentSongData.title} — ${currentSongData.artist}`,
+          text: `check this out on divy's page`,
+          url: data.url,
+        });
+        btn.textContent = '♫ SHARE THIS SONG';
+        btn.disabled = false;
+      } else {
+        await navigator.clipboard.writeText(data.url);
+        btn.textContent = '✓ COPIED!';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = '♫ SHARE THIS SONG'; btn.classList.remove('copied'); btn.disabled = false; }, 2000);
+      }
     } catch (e) {
       btn.textContent = '♫ SHARE THIS SONG';
       btn.disabled = false;
