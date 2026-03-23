@@ -453,6 +453,29 @@
       box-shadow: inset 0 0 6px #004400;
     }
 
+    /* ── TOP PLAYLISTS ── */
+    .playlist-tiles { display: flex; flex-direction: column; gap: 10px; }
+    .playlist-tile {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none; padding: 6px;
+      border: 1px solid var(--border); background: #0a0a18;
+      transition: background 0.2s;
+    }
+    .playlist-tile:hover { background: #1a1a3a; }
+    .playlist-tile img {
+      width: 48px; height: 48px; flex-shrink: 0;
+      border: 1px solid var(--border);
+    }
+    .playlist-tile-info { min-width: 0; flex: 1; }
+    .playlist-tile-name {
+      font-family: 'Press Start 2P', monospace; font-size: 7px;
+      color: var(--accent1); line-height: 1.6;
+      word-break: break-word; margin-bottom: 3px;
+    }
+    .playlist-tile-count {
+      font-family: 'VT323', monospace; font-size: 14px; color: var(--muted);
+    }
+
     /* ── NOW PLAYING ── */
     .now-playing {
       font-family: 'VT323', monospace;
@@ -858,6 +881,14 @@
         </div>
       </div>
 
+      <!-- Top playlists -->
+      <div class="panel">
+        <div class="panel-header"><span class="icon">🎧</span> TOP PLAYLISTS</div>
+        <div class="panel-body" id="playlistsWidget">
+          <div style="font-family:VT323,monospace;font-size:16px;color:var(--muted);">loading...</div>
+        </div>
+      </div>
+
       <!-- Mood widget -->
       <div class="panel">
         <div class="panel-header"><span class="icon">🧠</span> CURRENT STATUS</div>
@@ -1203,6 +1234,33 @@
 
   fetchNowPlaying();
   setInterval(fetchNowPlaying, 4000); // poll every 4s for near-live updates
+
+  // ─── TOP PLAYLISTS ───────────────────────────────────────────
+  async function fetchPlaylists() {
+    const widget = document.getElementById('playlistsWidget');
+    try {
+      const res = await fetch('/api/playlists');
+      const data = await res.json();
+      if (!data.playlists || data.playlists.length === 0) {
+        widget.innerHTML = `<div style="font-family:VT323,monospace;font-size:16px;color:var(--muted);">no playlists found</div>`;
+        return;
+      }
+      widget.innerHTML = `<div class="playlist-tiles">${
+        data.playlists.map(p => `
+          <a class="playlist-tile" href="${escapeHTML(p.url)}" target="_blank" rel="noopener">
+            ${p.coverArt ? `<img src="${escapeHTML(p.coverArt)}" alt="cover" />` : `<div style="width:48px;height:48px;background:#1a1a3a;flex-shrink:0;border:1px solid var(--border);"></div>`}
+            <div class="playlist-tile-info">
+              <div class="playlist-tile-name">${escapeHTML(p.name)}</div>
+              <div class="playlist-tile-count">${p.trackCount} tracks</div>
+            </div>
+          </a>
+        `).join('')
+      }</div>`;
+    } catch (e) {
+      widget.innerHTML = `<div style="font-family:VT323,monospace;font-size:16px;color:var(--muted);">playlists offline 🎧</div>`;
+    }
+  }
+  fetchPlaylists();
 
   // ─── INIT ────────────────────────────────────────────────────
   loadPosts();
