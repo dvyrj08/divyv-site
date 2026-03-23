@@ -40,20 +40,15 @@ export default async function handler(req, res) {
 
   const allItems = (playlistsData.items || []);
 
-  // debug: expose raw public + tracks data
-  if (req.query.debug) {
-    return res.status(200).json({ _first: allItems[0] });
-  }
-
   // 3. Filter public non-empty playlists, sort by track count desc, take top 3
   const top3 = allItems
     .filter(p => p.public !== false)
-    .filter(p => (p.tracks?.total || 0) > 0)
-    .sort((a, b) => (b.tracks?.total || 0) - (a.tracks?.total || 0))
+    .filter(p => (p.items?.total || 0) > 0)
+    .sort((a, b) => (b.items?.total || 0) - (a.items?.total || 0))
     .slice(0, 3)
     .map(p => ({
       name: p.name,
-      trackCount: p.tracks?.total || 0,
+      trackCount: p.items?.total || 0,
       coverArt: p.images?.[0]?.url || null,
       url: p.external_urls?.spotify || '#',
     }));
