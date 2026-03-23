@@ -898,7 +898,7 @@
   }
 
   async function deletePost(id) {
-    const code = prompt('enter invite code to delete:');
+    const code = prompt('enter master code to delete:');
     if (!code) return;
     try {
       const res = await fetch('/api/posts', {
