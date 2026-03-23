@@ -42,9 +42,7 @@ export default async function handler(req, res) {
 
   // debug: expose raw public + tracks data
   if (req.query.debug) {
-    return res.status(200).json({
-      _raw: allItems.slice(0, 3).map(p => ({ name: p.name, public: p.public, tracks: p.tracks }))
-    });
+    return res.status(200).json({ _first: allItems[0] });
   }
 
   // 3. Filter public non-empty playlists, sort by track count desc, take top 3
