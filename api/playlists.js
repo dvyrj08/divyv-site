@@ -43,7 +43,7 @@ export default async function handler(req, res) {
   // debug: expose raw public + tracks data
   if (req.query.debug) {
     return res.status(200).json({
-      _raw: allItems.map(p => ({ name: p.name, public: p.public, tracks: p.tracks?.total }))
+      _raw: allItems.slice(0, 3).map(p => ({ name: p.name, public: p.public, tracks: p.tracks }))
     });
   }
 
