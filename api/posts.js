@@ -35,12 +35,7 @@ export default async function handler(req, res) {
 
     const upper = code.toUpperCase().trim();
     if (!VALID_CODES.includes(upper)) {
-      return res.status(403).json({ error: 'invalid or already used code' });
-    }
-
-    const usedCodes = (await kv.get('used_codes')) || [];
-    if (usedCodes.includes(upper)) {
-      return res.status(403).json({ error: 'invalid or already used code' });
+      return res.status(403).json({ error: 'invalid code' });
     }
 
     // Rate limit: 5 posts per IP per hour
@@ -62,7 +57,6 @@ export default async function handler(req, res) {
     posts.unshift({ id: Date.now().toString(), text, tag: tag || '', date });
 
     await kv.set('posts', posts);
-    await kv.set('used_codes', [...usedCodes, upper]);
 
     return res.status(200).json({ ok: true, posts });
   }
