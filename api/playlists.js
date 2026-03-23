@@ -38,8 +38,10 @@ export default async function handler(req, res) {
 
   const playlistsData = await playlistsRes.json();
 
-  // 3. Sort by track count desc, take top 3
+  // 3. Filter public non-empty playlists, sort by track count desc, take top 3
   const top3 = (playlistsData.items || [])
+    .filter(p => p.public === true)
+    .filter(p => (p.tracks?.total || 0) > 0)
     .sort((a, b) => (b.tracks?.total || 0) - (a.tracks?.total || 0))
     .slice(0, 3)
     .map(p => ({
