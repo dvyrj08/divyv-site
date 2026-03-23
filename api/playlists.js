@@ -32,7 +32,8 @@ export default async function handler(req, res) {
   });
 
   if (!playlistsRes.ok) {
-    return res.status(200).json({ playlists: [] });
+    const errBody = await playlistsRes.json().catch(() => ({}));
+    return res.status(200).json({ playlists: [], _debug: { status: playlistsRes.status, error: errBody } });
   }
 
   const playlistsData = await playlistsRes.json();
