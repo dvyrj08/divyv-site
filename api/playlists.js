@@ -40,8 +40,9 @@ export default async function handler(req, res) {
 
   const allItems = (playlistsData.items || []);
 
-  // 3. Filter public non-empty playlists, sort by track count desc, take top 3
+  // 3. Filter own public non-empty playlists, sort by track count desc, take top 3
   const top3 = allItems
+    .filter(p => p.owner?.id === '316stuthlrdjaz2bwhrtri3gi54q')
     .filter(p => p.public !== false)
     .filter(p => (p.items?.total || 0) > 0)
     .sort((a, b) => (b.items?.total || 0) - (a.items?.total || 0))
