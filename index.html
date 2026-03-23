@@ -586,7 +586,7 @@
     <div class="status-bar">
       <span><span class="dot"></span>online</span>
       <span>📍 toronto, canada</span>
-      <span>🖥️ programmer</span>
+      <span>✌️ just a guy</span>
       <span>age: 24</span>
     </div>
   </header>
@@ -646,8 +646,8 @@
                 </div>
               </div>
               <div class="about-name">divy</div>
-              hey — i'm divy. 24, based in toronto. i write code for a living and think too much about everything else.<br><br>
-              early career dev figuring it out. currently grinding through whatever problem is on my screen. sometimes that problem is the code, sometimes it's me.<br><br>
+              hey — i'm divy. 24, based in toronto. i think too much and sleep too little.<br><br>
+              figuring it out as i go. currently overthinking things that probably don't matter. sometimes that helps, sometimes it doesn't.<br><br>
               this is my little spot on the internet where i don't have to perform for anyone.
             </div>
             <div class="stat-row">
@@ -661,7 +661,7 @@
               </div>
               <div class="stat">
                 <span class="stat-num">∞</span>
-                <span class="stat-label">bugs fixed</span>
+                <span class="stat-label">things broken</span>
               </div>
             </div>
           </div>
@@ -679,7 +679,7 @@
                   <span class="link-icon">🐙</span>
                   <span>
                     github
-                    <span class="link-desc">where the code actually lives</span>
+                    <span class="link-desc">stuff i've built</span>
                   </span>
                 </a>
               </li>
@@ -774,7 +774,7 @@
         <div class="panel-header"><span class="icon">🧠</span> CURRENT STATUS</div>
         <div class="panel-body">
           <div class="mood-row"><span>mood</span><span class="mood-val">☕ caffeinated</span></div>
-          <div class="mood-row"><span>currently</span><span class="mood-val">🖥️ coding</span></div>
+          <div class="mood-row"><span>currently</span><span class="mood-val">🔨 building something</span></div>
           <div class="mood-row"><span>weather</span><span class="mood-val">🌨️ toronto</span></div>
           <div class="mood-row"><span>feeling</span><span class="mood-val">🧩 building</span></div>
         </div>
@@ -785,8 +785,8 @@
         <div class="panel-header"><span class="icon">⚙️</span> SITE INFO</div>
         <div class="panel-body" style="font-family: VT323, monospace; font-size: 16px; color: var(--muted); line-height: 2;">
           <div>🗓️ est. 2026</div>
-          <div>🌐 hand-crafted html</div>
-          <div>✨ no frameworks</div>
+          <div>🌐 built by hand</div>
+          <div>✨ kept it simple</div>
           <div>🚫 no ads ever</div>
           <div>💜 made in toronto</div>
         </div>
@@ -883,7 +883,7 @@
       });
       const data = await res.json();
       if (!res.ok) {
-        errEl.textContent = '✕ ' + (data.error || 'invalid or already used code.');
+        errEl.textContent = '✕ ' + (data.error || 'invalid code.');
         errEl.style.display = 'block';
         return;
       }
