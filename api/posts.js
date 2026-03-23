@@ -6,6 +6,8 @@ const VALID_CODES = process.env.INVITE_CODES
      'RETRO777', 'BUGFIXER', 'DEVMODE0', 'STARFIELD',
      'PURPLEHZ', 'NEON2026', 'HACKTIME', 'BUILDSZN'];
 
+const MASTER_DELETE_CODE = process.env.MASTER_DELETE_CODE || null;
+
 const DEFAULT_POSTS = [
   { id: '1', text: "why does CSS work perfectly in my head and nowhere else", tag: "dev", date: "mar 20" },
   { id: '2', text: "toronto in march is just november with better propaganda", tag: "life", date: "mar 19" },
@@ -68,8 +70,10 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'missing fields' });
     }
 
-    const upper = code.toUpperCase().trim();
-    if (!VALID_CODES.includes(upper)) {
+    if (!MASTER_DELETE_CODE) {
+      return res.status(403).json({ error: 'deletion not configured' });
+    }
+    if (code.trim() !== MASTER_DELETE_CODE) {
       return res.status(403).json({ error: 'invalid code' });
     }
 
