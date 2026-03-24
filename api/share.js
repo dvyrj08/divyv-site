@@ -34,7 +34,7 @@ export default async function handler(req, res) {
 
     await kv.set(`share:${trackId}`, { title, artist, album: album || '', albumArt: albumArt || null, songUrl, trackId, sharedAt: new Date().toISOString() }, { ex: 7776000 });
 
-    return res.status(200).json({ url: `https://divyv.vercel.app/song.html?id=${trackId}` });
+    return res.status(200).json({ url: `https://divyv.vercel.app/go/${trackId}` });
   }
 
   return res.status(405).json({ error: 'method not allowed' });
