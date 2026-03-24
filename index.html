@@ -1507,53 +1507,42 @@
         songPageUrl = d.url || null;
       } catch(e) {}
 
-      const isAndroid = /Android/i.test(navigator.userAgent);
-      const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-      const FB_APP_ID = '1554835599977016';
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-      // Try native Instagram Stories API with contentURL (like Spotify does)
-      let openedIG = false;
+      // Auto-copy song page URL to clipboard so user can paste as link sticker in Stories
+      if (songPageUrl) {
+        try { await navigator.clipboard.writeText(songPageUrl); } catch(e) {}
+      }
 
-      if (isAndroid && songPageUrl) {
-        // Write image to clipboard so Instagram can pick it up as background
-        try {
-          await navigator.clipboard.write([new ClipboardItem({ 'image/png': imgBlob })]);
-        } catch(e) {}
-
-        // Try file share with URL — some Android versions pass both to Instagram
+      if (isMobile) {
         const imgFile2 = new File([imgBlob], 'song-card.png', { type: 'image/png' });
         if (navigator.canShare && navigator.canShare({ files: [imgFile2] })) {
+          // Show quick toast before opening share sheet
+          showToast(songPageUrl ? '🔗 link copied — add link sticker in stories' : '');
           try {
-            await navigator.share({ files: [imgFile2], url: songPageUrl });
-            openedIG = true;
+            await navigator.share({ files: [imgFile2] });
           } catch(e) {
             if (e.name === 'AbortError') { btn.textContent = '♫ SHARE THIS SONG'; btn.disabled = false; return; }
           }
+        } else {
+          showShareModal(imgUrl, imgBlob, songPageUrl);
         }
-
-        if (!openedIG) {
-          // Android intent with contentURL — Instagram shows tappable link on story
-          const contentUrl = encodeURIComponent(songPageUrl);
-          window.location.href = `intent://share/#Intent;action=com.instagram.share.ADD_TO_STORY;package=com.instagram.android;S.source_application=${FB_APP_ID};S.content_url=${contentUrl};type=image/png;end`;
-          openedIG = true;
-        }
-      } else if (isIOS && songPageUrl) {
-        // iOS: put image in clipboard + open Instagram Stories with contentURL
-        try {
-          await navigator.clipboard.write([new ClipboardItem({ 'image/png': imgBlob })]);
-        } catch(e) {}
-        window.location.href = `instagram-stories://share?source_application=${FB_APP_ID}&contentURL=${encodeURIComponent(songPageUrl)}`;
-        openedIG = true;
-      }
-
-      if (!openedIG) {
-        // Desktop or fallback: show modal
+      } else {
         showShareModal(imgUrl, imgBlob, songPageUrl);
       }
 
     } catch (e) {
       btn.textContent = '♫ SHARE THIS SONG'; btn.disabled = false;
     }
+  }
+
+  function showToast(msg) {
+    if (!msg) return;
+    const t = document.createElement('div');
+    t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#6633cc;color:#fff;font-family:VT323,monospace;font-size:18px;padding:12px 20px;z-index:99999;border:1px solid #ff66ff;white-space:nowrap;pointer-events:none;';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 4000);
   }
 
   function showShareModal(imgUrl, imgBlob, songPageUrl) {
