@@ -1507,8 +1507,49 @@
         songPageUrl = d.url || null;
       } catch(e) {}
 
-      // Always show modal — gives user image + link for Stories
-      showShareModal(imgUrl, imgBlob, songPageUrl);
+      const isAndroid = /Android/i.test(navigator.userAgent);
+      const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+      const FB_APP_ID = '1554835599977016';
+
+      // Try native Instagram Stories API with contentURL (like Spotify does)
+      let openedIG = false;
+
+      if (isAndroid && songPageUrl) {
+        // Write image to clipboard so Instagram can pick it up as background
+        try {
+          await navigator.clipboard.write([new ClipboardItem({ 'image/png': imgBlob })]);
+        } catch(e) {}
+
+        // Try file share with URL — some Android versions pass both to Instagram
+        const imgFile2 = new File([imgBlob], 'song-card.png', { type: 'image/png' });
+        if (navigator.canShare && navigator.canShare({ files: [imgFile2] })) {
+          try {
+            await navigator.share({ files: [imgFile2], url: songPageUrl });
+            openedIG = true;
+          } catch(e) {
+            if (e.name === 'AbortError') { btn.textContent = '♫ SHARE THIS SONG'; btn.disabled = false; return; }
+          }
+        }
+
+        if (!openedIG) {
+          // Android intent with contentURL — Instagram shows tappable link on story
+          const contentUrl = encodeURIComponent(songPageUrl);
+          window.location.href = `intent://share/#Intent;action=com.instagram.share.ADD_TO_STORY;package=com.instagram.android;S.source_application=${FB_APP_ID};S.content_url=${contentUrl};type=image/png;end`;
+          openedIG = true;
+        }
+      } else if (isIOS && songPageUrl) {
+        // iOS: put image in clipboard + open Instagram Stories with contentURL
+        try {
+          await navigator.clipboard.write([new ClipboardItem({ 'image/png': imgBlob })]);
+        } catch(e) {}
+        window.location.href = `instagram-stories://share?source_application=${FB_APP_ID}&contentURL=${encodeURIComponent(songPageUrl)}`;
+        openedIG = true;
+      }
+
+      if (!openedIG) {
+        // Desktop or fallback: show modal
+        showShareModal(imgUrl, imgBlob, songPageUrl);
+      }
 
     } catch (e) {
       btn.textContent = '♫ SHARE THIS SONG'; btn.disabled = false;
