@@ -1489,9 +1489,38 @@
       cx.font = '64px VT323, monospace'; cx.fillStyle = '#33ffcc';
       cx.fillText(song.artist, W/2, titleY+lines.slice(0,3).length*80+60);
 
+      // Full-width TAP TO LISTEN button — covers bottom of card, whole screen looks clickable
+      const btnY = H - 280;
+      const btnH = 160;
+      const btnPad = 40;
+
+      // Button background
+      const btnGrad = cx.createLinearGradient(btnPad, btnY, W-btnPad, btnY+btnH);
+      btnGrad.addColorStop(0, '#6633cc');
+      btnGrad.addColorStop(1, '#ff66ff');
+      cx.fillStyle = btnGrad;
+      cx.beginPath();
+      cx.roundRect(btnPad, btnY, W - btnPad*2, btnH, 20);
+      cx.fill();
+
+      // Button glow
+      cx.shadowColor = '#ff66ff'; cx.shadowBlur = 40;
+      cx.strokeStyle = '#fff'; cx.lineWidth = 3;
+      cx.beginPath();
+      cx.roundRect(btnPad, btnY, W - btnPad*2, btnH, 20);
+      cx.stroke();
+      cx.shadowBlur = 0;
+
+      // Button text
+      cx.font = 'bold 44px "Press Start 2P", monospace';
+      cx.fillStyle = '#fff';
+      cx.shadowColor = 'rgba(0,0,0,0.5)'; cx.shadowBlur = 8;
+      cx.fillText('▶ TAP TO LISTEN', W/2, btnY + btnH/2 + 16);
+      cx.shadowBlur = 0;
+
       // Watermark
-      cx.font = '38px VT323, monospace'; cx.fillStyle = 'rgba(153,153,187,0.6)';
-      cx.fillText('★ divyv.vercel.app ★', W/2, H-80);
+      cx.font = '32px VT323, monospace'; cx.fillStyle = 'rgba(153,153,187,0.5)';
+      cx.fillText('divyv.vercel.app', W/2, H - 50);
       cx.textAlign='left';
 
       // Get blob
