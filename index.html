@@ -1428,20 +1428,68 @@
 
       const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-      if (isMobile && navigator.canShare && navigator.canShare({ files: [videoFile] })) {
-        // Mobile: share video file → Instagram Stories appears in share sheet
-        await navigator.share({ files: [videoFile] });
+      // helper: generate a still PNG from the canvas as fallback
+      async function generateSongImage(song) {
+        const W = 720, H = 1280;
+        const c = document.createElement('canvas');
+        c.width = W; c.height = H;
+        const x = c.getContext('2d');
+        // same drawing as video frame at t=1
+        x.fillStyle = '#0d0d1a'; x.fillRect(0, 0, W, H);
+        const rb = x.createLinearGradient(0, 0, W, 0);
+        rb.addColorStop(0,'#ff66ff'); rb.addColorStop(.33,'#6633cc');
+        rb.addColorStop(.66,'#33ffcc'); rb.addColorStop(1,'#ffcc00');
+        x.fillStyle = rb; x.fillRect(0, 0, W, 10);
+        if (albumImg) {
+          const artSize=480, artX=(W-artSize)/2, artY=H*0.18;
+          x.shadowColor='#6633cc'; x.shadowBlur=40;
+          x.drawImage(albumImg, artX, artY, artSize, artSize);
+          x.shadowBlur=0; x.strokeStyle='#6633cc'; x.lineWidth=4;
+          x.strokeRect(artX, artY, artSize, artSize);
+        }
+        // EQ bars (static)
+        const eqBars=[{color:'#ff66ff',h:40},{color:'#33ffcc',h:60},{color:'#ffcc00',h:30},{color:'#33ffcc',h:50},{color:'#ff66ff',h:45}];
+        const bW=18,bG=14,tot=eqBars.length*bW+(eqBars.length-1)*bG,eqX=(W-tot)/2,eqY=H*0.18+480+70;
+        eqBars.forEach((b,i)=>{x.fillStyle=b.color;x.shadowColor=b.color;x.shadowBlur=12;x.fillRect(eqX+i*(bW+bG),eqY-b.h,bW,b.h+4);});
+        x.shadowBlur=0;
+        x.font='bold 26px "Press Start 2P",monospace'; x.textAlign='center'; x.fillStyle='#ff66ff';
+        x.shadowColor='#ff66ff'; x.shadowBlur=20; x.fillText(song.title.slice(0,24), W/2, eqY+80); x.shadowBlur=0;
+        x.font='40px VT323,monospace'; x.fillStyle='#33ffcc'; x.fillText(song.artist, W/2, eqY+130);
+        x.font='22px VT323,monospace'; x.fillStyle='rgba(153,153,187,0.7)'; x.fillText('★ divyv.vercel.app ★', W/2, H-60);
+        return new Promise(r => c.toBlob(r, 'image/png'));
+      }
+
+      async function tryShare(file) {
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file] });
+          return true;
+        }
+        return false;
+      }
+
+      if (isMobile) {
+        // Try video first, fall back to image
+        let shared = false;
+        if (videoBlob.size > 1000) {
+          try { shared = await tryShare(videoFile); } catch(e2) { shared = false; }
+        }
+        if (!shared) {
+          btn.textContent = 'MAKING IMAGE...';
+          const imgBlob = await generateSongImage(currentSongData);
+          const imgFile = new File([imgBlob], 'song.png', { type: 'image/png' });
+          try { shared = await tryShare(imgFile); } catch(e3) { shared = false; }
+        }
+        if (!shared && data.url) {
+          await navigator.share({ title: `${currentSongData.title}`, text: 'check this out', url: data.url });
+        }
         btn.textContent = '♫ SHARE THIS SONG';
         btn.disabled = false;
       } else {
-        // Desktop or fallback: auto-download the video
+        // Desktop: download the video
         const url = URL.createObjectURL(videoBlob);
         const a = document.createElement('a');
-        a.href = url;
-        a.download = `song-${Date.now()}.${ext}`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        a.href = url; a.download = `song-${Date.now()}.${ext}`;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
         setTimeout(() => URL.revokeObjectURL(url), 5000);
         btn.textContent = '✓ VIDEO DOWNLOADED!';
         btn.classList.add('copied');
