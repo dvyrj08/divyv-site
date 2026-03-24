@@ -1538,6 +1538,21 @@
 
       const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
+      // ── Android native bridge (WebView wrapper app) ──────────────
+      // window.AndroidShare is injected by the native Kotlin JavascriptInterface.
+      // It fires the ADD_TO_STORY intent with the card image + content_url so
+      // story viewers get a real tappable link to divyv.vercel.app/song?id=...
+      if (window.AndroidShare && songPageUrl) {
+        try {
+          const base64DataUrl = cv.toDataURL('image/png');
+          window.AndroidShare.shareToStories(base64DataUrl, songPageUrl);
+          btn.textContent = '♫ SHARE THIS SONG'; btn.disabled = false;
+          return;
+        } catch(e) {
+          // Fall through to web share if native bridge errors
+        }
+      }
+
       // Auto-copy song page URL to clipboard so user can paste as link sticker in Stories
       if (songPageUrl) {
         try { await navigator.clipboard.writeText(songPageUrl); } catch(e) {}
