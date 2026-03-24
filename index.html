@@ -1448,8 +1448,14 @@
         setTimeout(() => { btn.textContent = '♫ SHARE THIS SONG'; btn.classList.remove('copied'); btn.disabled = false; }, 3000);
       }
     } catch (e) {
-      // if user cancelled share sheet, just reset
-      btn.textContent = '♫ SHARE THIS SONG';
+      // show actual error for debugging
+      const msg = e && e.message ? e.message : String(e);
+      if (msg.toLowerCase().includes('cancel') || msg.toLowerCase().includes('abort')) {
+        btn.textContent = '♫ SHARE THIS SONG';
+      } else {
+        btn.textContent = 'ERR: ' + msg.slice(0, 30);
+        setTimeout(() => { btn.textContent = '♫ SHARE THIS SONG'; }, 5000);
+      }
       btn.disabled = false;
     }
   }
