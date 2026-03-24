@@ -1489,8 +1489,19 @@
       cx.font = '64px VT323, monospace'; cx.fillStyle = '#33ffcc';
       cx.fillText(song.artist, W/2, titleY+lines.slice(0,3).length*80+60);
 
+      // Spotify badge at bottom
+      const badgeW = 420, badgeH = 72, badgeX = (W - badgeW) / 2, badgeY = H - 160;
+      cx.fillStyle = '#1DB954';
+      cx.beginPath();
+      cx.roundRect(badgeX, badgeY, badgeW, badgeH, 8);
+      cx.fill();
+      cx.font = 'bold 28px "Press Start 2P", monospace';
+      cx.fillStyle = '#000';
+      cx.textAlign = 'center';
+      cx.fillText('PLAY ON SPOTIFY', W/2, badgeY + 44);
+
       // Watermark
-      cx.font = '32px VT323, monospace'; cx.fillStyle = 'rgba(153,153,187,0.5)';
+      cx.font = '30px VT323, monospace'; cx.fillStyle = 'rgba(153,153,187,0.4)';
       cx.fillText('divyv.vercel.app', W/2, H - 50);
       cx.textAlign='left';
 
