@@ -1409,112 +1409,144 @@
     if (!currentSongData) return;
     const btn = document.getElementById('share-song-btn');
     btn.disabled = true;
+    btn.textContent = 'BUILDING...';
 
     try {
-      // Save to KV for the song page link
-      btn.textContent = 'SAVING...';
-      const res = await fetch('/api/share', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(currentSongData),
+      const song = currentSongData;
+
+      // Load album art
+      let albumImg = null;
+      if (song.albumArt) {
+        albumImg = await new Promise(r => {
+          const i = new Image(); i.crossOrigin = 'anonymous';
+          i.onload = () => r(i); i.onerror = () => r(null);
+          i.src = song.albumArt;
+        });
+      }
+
+      // Draw PNG card
+      const W = 1080, H = 1920;
+      const cv = document.createElement('canvas');
+      cv.width = W; cv.height = H;
+      const cx = cv.getContext('2d');
+
+      // BG
+      cx.fillStyle = '#0d0d1a'; cx.fillRect(0, 0, W, H);
+
+      // Stars
+      for (let i = 0; i < 150; i++) {
+        cx.globalAlpha = Math.random() * 0.7 + 0.2;
+        cx.fillStyle = '#fff';
+        cx.beginPath();
+        cx.arc(Math.random()*W, Math.random()*H, Math.random()*1.5+0.5, 0, Math.PI*2);
+        cx.fill();
+      }
+      cx.globalAlpha = 1;
+
+      // Rainbow bar
+      const rb = cx.createLinearGradient(0,0,W,0);
+      rb.addColorStop(0,'#ff66ff'); rb.addColorStop(.33,'#6633cc');
+      rb.addColorStop(.66,'#33ffcc'); rb.addColorStop(1,'#ffcc00');
+      cx.fillStyle = rb; cx.fillRect(0, 0, W, 12);
+
+      // Album art
+      const artSize = 700, artX = (W-artSize)/2, artY = H*0.16;
+      if (albumImg) {
+        cx.shadowColor = '#6633cc'; cx.shadowBlur = 60;
+        cx.drawImage(albumImg, artX, artY, artSize, artSize);
+        cx.shadowBlur = 0;
+        cx.strokeStyle = '#6633cc'; cx.lineWidth = 6;
+        cx.strokeRect(artX, artY, artSize, artSize);
+        cx.strokeStyle = 'rgba(102,51,204,0.4)'; cx.lineWidth = 2;
+        cx.strokeRect(artX-14, artY-14, artSize+28, artSize+28);
+      }
+
+      // EQ bars
+      const bars = [{c:'#ff66ff',h:80},{c:'#33ffcc',h:110},{c:'#ffcc00',h:60},{c:'#33ffcc',h:95},{c:'#ff66ff',h:75}];
+      const bW=28, bG=18, tot=bars.length*bW+(bars.length-1)*bG;
+      const eqX=(W-tot)/2, eqY=artY+artSize+100;
+      bars.forEach((b,i)=>{
+        cx.fillStyle=b.c; cx.shadowColor=b.c; cx.shadowBlur=18;
+        cx.fillRect(eqX+i*(bW+bG), eqY-b.h, bW, b.h+6);
       });
-      const data = await res.json();
+      cx.shadowBlur=0;
 
-      // Render the animated card video
-      btn.textContent = 'RENDERING...';
-      const videoBlob = await generateSongVideo(currentSongData);
-      const ext = videoBlob.type.includes('mp4') ? 'mp4' : 'webm';
-      const videoFile = new File([videoBlob], `song.${ext}`, { type: videoBlob.type });
+      // Title
+      await document.fonts.ready;
+      cx.font = 'bold 52px "Press Start 2P", monospace';
+      cx.textAlign = 'center'; cx.fillStyle = '#ff66ff';
+      cx.shadowColor = '#ff66ff'; cx.shadowBlur = 30;
+      const titleY = eqY + 100;
+      // wrap title
+      const words = song.title.split(' ');
+      let lines = [], cur = '';
+      words.forEach(w => { const t = cur?cur+' '+w:w; if(cx.measureText(t).width>W-120&&cur){lines.push(cur);cur=w;}else cur=t; });
+      if(cur)lines.push(cur);
+      lines.slice(0,3).forEach((l,i)=>cx.fillText(l, W/2, titleY+i*80));
+      cx.shadowBlur=0;
 
-      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      // Artist
+      cx.font = '64px VT323, monospace'; cx.fillStyle = '#33ffcc';
+      cx.fillText(song.artist, W/2, titleY+lines.slice(0,3).length*80+60);
 
-      // helper: generate a still PNG from the canvas as fallback
-      async function generateSongImage(song) {
-        const W = 720, H = 1280;
-        const c = document.createElement('canvas');
-        c.width = W; c.height = H;
-        const x = c.getContext('2d');
-        // load album art locally
-        let img = null;
-        if (song.albumArt) {
-          img = await new Promise(r => {
-            const i = new Image(); i.crossOrigin = 'anonymous';
-            i.onload = () => r(i); i.onerror = () => r(null);
-            i.src = song.albumArt;
-          });
+      // Watermark
+      cx.font = '38px VT323, monospace'; cx.fillStyle = 'rgba(153,153,187,0.6)';
+      cx.fillText('★ divyv.vercel.app ★', W/2, H-80);
+      cx.textAlign='left';
+
+      // Get blob
+      const imgBlob = await new Promise(r => cv.toBlob(r, 'image/png'));
+      const imgFile = new File([imgBlob], 'song-card.png', { type: 'image/png' });
+      const imgUrl = URL.createObjectURL(imgBlob);
+
+      // Try native share with file (works on Android Chrome)
+      let sharedNatively = false;
+      if (navigator.canShare && navigator.canShare({ files: [imgFile] })) {
+        try {
+          await navigator.share({ files: [imgFile] });
+          sharedNatively = true;
+        } catch(e) {
+          if (e.name === 'AbortError') { btn.textContent = '♫ SHARE THIS SONG'; btn.disabled = false; return; }
         }
-        x.fillStyle = '#0d0d1a'; x.fillRect(0, 0, W, H);
-        const rb = x.createLinearGradient(0, 0, W, 0);
-        rb.addColorStop(0,'#ff66ff'); rb.addColorStop(.33,'#6633cc');
-        rb.addColorStop(.66,'#33ffcc'); rb.addColorStop(1,'#ffcc00');
-        x.fillStyle = rb; x.fillRect(0, 0, W, 10);
-        if (img) {
-          const artSize=480, artX=(W-artSize)/2, artY=H*0.18;
-          x.shadowColor='#6633cc'; x.shadowBlur=40;
-          x.drawImage(img, artX, artY, artSize, artSize);
-          x.shadowBlur=0; x.strokeStyle='#6633cc'; x.lineWidth=4;
-          x.strokeRect(artX, artY, artSize, artSize);
-        }
-        // EQ bars (static)
-        const eqBars=[{color:'#ff66ff',h:40},{color:'#33ffcc',h:60},{color:'#ffcc00',h:30},{color:'#33ffcc',h:50},{color:'#ff66ff',h:45}];
-        const bW=18,bG=14,tot=eqBars.length*bW+(eqBars.length-1)*bG,eqX=(W-tot)/2,eqY=H*0.18+480+70;
-        eqBars.forEach((b,i)=>{x.fillStyle=b.color;x.shadowColor=b.color;x.shadowBlur=12;x.fillRect(eqX+i*(bW+bG),eqY-b.h,bW,b.h+4);});
-        x.shadowBlur=0;
-        x.font='bold 26px "Press Start 2P",monospace'; x.textAlign='center'; x.fillStyle='#ff66ff';
-        x.shadowColor='#ff66ff'; x.shadowBlur=20; x.fillText(song.title.slice(0,24), W/2, eqY+80); x.shadowBlur=0;
-        x.font='40px VT323,monospace'; x.fillStyle='#33ffcc'; x.fillText(song.artist, W/2, eqY+130);
-        x.font='22px VT323,monospace'; x.fillStyle='rgba(153,153,187,0.7)'; x.fillText('★ divyv.vercel.app ★', W/2, H-60);
-        return new Promise(r => c.toBlob(r, 'image/png'));
       }
 
-      async function tryShare(file) {
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({ files: [file] });
-          return true;
-        }
-        return false;
+      if (!sharedNatively) {
+        // Show preview modal with download button
+        showShareModal(imgUrl, imgBlob);
       }
 
-      if (isMobile) {
-        // Try video first, fall back to image
-        let shared = false;
-        if (videoBlob.size > 1000) {
-          try { shared = await tryShare(videoFile); } catch(e2) { shared = false; }
-        }
-        if (!shared) {
-          btn.textContent = 'MAKING IMAGE...';
-          const imgBlob = await generateSongImage(currentSongData);
-          const imgFile = new File([imgBlob], 'song.png', { type: 'image/png' });
-          try { shared = await tryShare(imgFile); } catch(e3) { shared = false; }
-        }
-        if (!shared && data.url) {
-          await navigator.share({ title: `${currentSongData.title}`, text: 'check this out', url: data.url });
-        }
-        btn.textContent = '♫ SHARE THIS SONG';
-        btn.disabled = false;
-      } else {
-        // Desktop: download the video
-        const url = URL.createObjectURL(videoBlob);
-        const a = document.createElement('a');
-        a.href = url; a.download = `song-${Date.now()}.${ext}`;
-        document.body.appendChild(a); a.click(); document.body.removeChild(a);
-        setTimeout(() => URL.revokeObjectURL(url), 5000);
-        btn.textContent = '✓ VIDEO DOWNLOADED!';
-        btn.classList.add('copied');
-        setTimeout(() => { btn.textContent = '♫ SHARE THIS SONG'; btn.classList.remove('copied'); btn.disabled = false; }, 3000);
-      }
+      btn.textContent = '♫ SHARE THIS SONG'; btn.disabled = false;
+
+      // Save to KV in background
+      fetch('/api/share', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(song) }).catch(()=>{});
+
     } catch (e) {
-      // show actual error for debugging
-      const msg = e && e.message ? e.message : String(e);
-      if (msg.toLowerCase().includes('cancel') || msg.toLowerCase().includes('abort')) {
-        btn.textContent = '♫ SHARE THIS SONG';
-      } else {
-        btn.textContent = 'ERR: ' + msg.slice(0, 30);
-        setTimeout(() => { btn.textContent = '♫ SHARE THIS SONG'; }, 5000);
-      }
-      btn.disabled = false;
+      btn.textContent = '♫ SHARE THIS SONG'; btn.disabled = false;
     }
   }
+
+  function showShareModal(imgUrl, imgBlob) {
+    const existing = document.getElementById('share-modal');
+    if (existing) existing.remove();
+    const modal = document.createElement('div');
+    modal.id = 'share-modal';
+    modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.85);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;';
+    modal.innerHTML = `
+      <div style="font-family:VT323,monospace;font-size:18px;color:#9999bb;margin-bottom:12px;letter-spacing:1px;">SAVE IMAGE → SHARE TO STORIES</div>
+      <img src="${imgUrl}" style="max-width:260px;max-height:460px;border:2px solid #6633cc;margin-bottom:16px;" />
+      <button id="sm-download" style="font-family:'Press Start 2P',monospace;font-size:9px;padding:14px 20px;background:#6633cc;color:#fff;border:none;cursor:pointer;width:100%;max-width:280px;margin-bottom:10px;">⬇ SAVE TO CAMERA ROLL</button>
+      <button id="sm-close" style="font-family:VT323,monospace;font-size:18px;padding:10px 20px;background:transparent;color:#9999bb;border:1px solid #333;cursor:pointer;width:100%;max-width:280px;">CLOSE</button>
+    `;
+    document.body.appendChild(modal);
+    document.getElementById('sm-download').onclick = () => {
+      const a = document.createElement('a');
+      a.href = imgUrl; a.download = 'song-card.png';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    };
+    document.getElementById('sm-close').onclick = () => { modal.remove(); URL.revokeObjectURL(imgUrl); };
+    modal.onclick = e => { if(e.target===modal){ modal.remove(); URL.revokeObjectURL(imgUrl); } };
+  }
+
 
   fetchNowPlaying();
   setInterval(fetchNowPlaying, 4000); // poll every 4s for near-live updates
