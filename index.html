@@ -971,7 +971,10 @@
   renderCounter(visits);
 
   // ─── POSTS ───────────────────────────────────────────────────
+  let _postsCache = [];
+
   function renderPosts(posts) {
+    _postsCache = posts;
     const container = document.getElementById('feedContainer');
     document.getElementById('postCount').textContent = posts.length;
     if (!posts.length) {
@@ -983,9 +986,129 @@
         <div class="post-meta">📌 ${p.date || 'recently'}</div>
         <div class="post-content">${escapeHTML(p.text)}</div>
         ${p.tag ? `<span class="post-tag">#${escapeHTML(p.tag)}</span>` : ''}
-        ${p.id ? `<button onclick="deletePost('${escapeHTML(p.id)}')" style="float:right;background:none;border:none;color:#555577;cursor:pointer;font-size:11px;font-family:VT323,monospace;margin-top:4px;">✕ delete</button>` : ''}
+        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:6px;">
+          <button onclick="sharePost('${escapeHTML(p.id || '')}')" style="background:none;border:none;color:#6633cc;cursor:pointer;font-size:13px;font-family:VT323,monospace;letter-spacing:1px;">♦ SHARE</button>
+          ${p.id ? `<button onclick="deletePost('${escapeHTML(p.id)}')" style="background:none;border:none;color:#555577;cursor:pointer;font-size:11px;font-family:VT323,monospace;">✕ delete</button>` : ''}
+        </div>
       </div>
     `).join('');
+  }
+
+  async function sharePost(id) {
+    const p = _postsCache.find(x => x.id === id) || _postsCache[0];
+    if (!p) return;
+
+    try {
+      const W = 1080, H = 1920;
+      const cv = document.createElement('canvas');
+      cv.width = W; cv.height = H;
+      const cx = cv.getContext('2d');
+
+      // BG + stars
+      cx.fillStyle = '#0d0d1a'; cx.fillRect(0, 0, W, H);
+      for (let i = 0; i < 150; i++) {
+        cx.globalAlpha = Math.random() * 0.7 + 0.2;
+        cx.fillStyle = '#fff';
+        cx.beginPath();
+        cx.arc(Math.random()*W, Math.random()*H, Math.random()*1.5+0.5, 0, Math.PI*2);
+        cx.fill();
+      }
+      cx.globalAlpha = 1;
+
+      // Rainbow bar
+      const rb = cx.createLinearGradient(0,0,W,0);
+      rb.addColorStop(0,'#ff66ff'); rb.addColorStop(.33,'#6633cc');
+      rb.addColorStop(.66,'#33ffcc'); rb.addColorStop(1,'#ffcc00');
+      cx.fillStyle = rb; cx.fillRect(0, 0, W, 12);
+
+      await document.fonts.ready;
+
+      // Header label
+      cx.font = '38px "Press Start 2P", monospace';
+      cx.textAlign = 'center'; cx.fillStyle = '#9999bb';
+      cx.shadowColor = 'rgba(102,51,204,0.5)'; cx.shadowBlur = 20;
+      cx.fillText("FROM DIVY'S FEED", W/2, 160);
+      cx.shadowBlur = 0;
+
+      // Decorative line
+      cx.strokeStyle = '#6633cc'; cx.lineWidth = 2;
+      cx.beginPath(); cx.moveTo(80, 200); cx.lineTo(W-80, 200); cx.stroke();
+
+      // Post text (wrapped)
+      cx.font = '62px VT323, monospace';
+      cx.fillStyle = '#e0e0f0';
+      cx.shadowColor = 'rgba(255,102,255,0.25)'; cx.shadowBlur = 16;
+      const maxW = W - 160;
+      const lh = 86;
+      const words = p.text.split(' ');
+      let lines = [], cur = '';
+      for (const w of words) {
+        const t = cur ? cur + ' ' + w : w;
+        if (cx.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t;
+      }
+      if (cur) lines.push(cur);
+      const totalH = lines.length * lh;
+      const startY = Math.max(320, (H - totalH) / 2 - 40);
+      lines.forEach((l, i) => cx.fillText(l, W/2, startY + i * lh));
+      cx.shadowBlur = 0;
+
+      // Tag
+      if (p.tag) {
+        cx.font = '52px VT323, monospace'; cx.fillStyle = '#6633cc';
+        cx.fillText(`#${p.tag}`, W/2, startY + lines.length * lh + 70);
+      }
+
+      // Date
+      if (p.date) {
+        cx.font = '40px VT323, monospace'; cx.fillStyle = '#ffcc00';
+        cx.fillText(`📌 ${p.date}`, W/2, H - 140);
+      }
+
+      // Watermark
+      cx.font = '30px VT323, monospace'; cx.fillStyle = 'rgba(153,153,187,0.4)';
+      cx.fillText('divyv.vercel.app', W/2, H - 55);
+      cx.textAlign = 'left';
+
+      const imgBlob = await new Promise(r => cv.toBlob(r, 'image/png'));
+      const imgFile = new File([imgBlob], 'post-card.png', { type: 'image/png' });
+      const imgUrl = URL.createObjectURL(imgBlob);
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+      if (window.AndroidShare) {
+        try {
+          window.AndroidShare.shareToStories(cv.toDataURL('image/png'), 'https://divyv.vercel.app');
+          return;
+        } catch(e) {}
+      }
+
+      if (isMobile && navigator.canShare && navigator.canShare({ files: [imgFile] })) {
+        try { await navigator.share({ files: [imgFile] }); } catch(e) {}
+      } else {
+        showPostShareModal(imgUrl, imgBlob);
+      }
+    } catch(e) {}
+  }
+
+  function showPostShareModal(imgUrl, imgBlob) {
+    const existing = document.getElementById('post-share-modal');
+    if (existing) existing.remove();
+    const modal = document.createElement('div');
+    modal.id = 'post-share-modal';
+    modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.92);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:24px 16px;overflow-y:auto;';
+    modal.innerHTML = `
+      <div style="font-family:'Press Start 2P',monospace;font-size:9px;color:#ff66ff;margin-bottom:16px;letter-spacing:1px;text-align:center;">SHARE TO IG STORIES</div>
+      <div style="font-family:VT323,monospace;font-size:16px;color:#9999bb;margin-bottom:8px;letter-spacing:1px;">SAVE CARD IMAGE</div>
+      <img src="${imgUrl}" style="max-width:180px;max-height:320px;border:2px solid #6633cc;box-shadow:0 0 20px rgba(102,51,204,0.5);margin-bottom:10px;" />
+      <button id="psm-download" style="font-family:'Press Start 2P',monospace;font-size:8px;padding:12px 20px;background:#6633cc;color:#fff;border:none;cursor:pointer;width:100%;max-width:320px;">⬇ SAVE IMAGE</button>
+      <button id="psm-close" style="font-family:VT323,monospace;font-size:18px;padding:10px 20px;background:transparent;color:#9999bb;border:1px solid #333;cursor:pointer;width:100%;max-width:320px;margin-top:14px;">CLOSE</button>
+    `;
+    document.body.appendChild(modal);
+    document.getElementById('psm-download').onclick = () => {
+      const a = document.createElement('a'); a.href = imgUrl; a.download = 'post-card.png';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    };
+    document.getElementById('psm-close').onclick = () => { modal.remove(); URL.revokeObjectURL(imgUrl); };
+    modal.onclick = e => { if(e.target===modal){ modal.remove(); URL.revokeObjectURL(imgUrl); } };
   }
 
   async function loadPosts() {
