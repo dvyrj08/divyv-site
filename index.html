@@ -1434,16 +1434,24 @@
         const c = document.createElement('canvas');
         c.width = W; c.height = H;
         const x = c.getContext('2d');
-        // same drawing as video frame at t=1
+        // load album art locally
+        let img = null;
+        if (song.albumArt) {
+          img = await new Promise(r => {
+            const i = new Image(); i.crossOrigin = 'anonymous';
+            i.onload = () => r(i); i.onerror = () => r(null);
+            i.src = song.albumArt;
+          });
+        }
         x.fillStyle = '#0d0d1a'; x.fillRect(0, 0, W, H);
         const rb = x.createLinearGradient(0, 0, W, 0);
         rb.addColorStop(0,'#ff66ff'); rb.addColorStop(.33,'#6633cc');
         rb.addColorStop(.66,'#33ffcc'); rb.addColorStop(1,'#ffcc00');
         x.fillStyle = rb; x.fillRect(0, 0, W, 10);
-        if (albumImg) {
+        if (img) {
           const artSize=480, artX=(W-artSize)/2, artY=H*0.18;
           x.shadowColor='#6633cc'; x.shadowBlur=40;
-          x.drawImage(albumImg, artX, artY, artSize, artSize);
+          x.drawImage(img, artX, artY, artSize, artSize);
           x.shadowBlur=0; x.strokeStyle='#6633cc'; x.lineWidth=4;
           x.strokeRect(artX, artY, artSize, artSize);
         }
