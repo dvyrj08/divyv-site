@@ -1499,50 +1499,64 @@
       const imgFile = new File([imgBlob], 'song-card.png', { type: 'image/png' });
       const imgUrl = URL.createObjectURL(imgBlob);
 
-      // Try native share with file (works on Android Chrome)
-      let sharedNatively = false;
-      if (navigator.canShare && navigator.canShare({ files: [imgFile] })) {
-        try {
-          await navigator.share({ files: [imgFile] });
-          sharedNatively = true;
-        } catch(e) {
-          if (e.name === 'AbortError') { btn.textContent = '♫ SHARE THIS SONG'; btn.disabled = false; return; }
-        }
-      }
+      // Save to KV to get the song page URL
+      let songPageUrl = null;
+      try {
+        const r = await fetch('/api/share', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(song) });
+        const d = await r.json();
+        songPageUrl = d.url || null;
+      } catch(e) {}
 
-      if (!sharedNatively) {
-        // Show preview modal with download button
-        showShareModal(imgUrl, imgBlob);
-      }
-
-      btn.textContent = '♫ SHARE THIS SONG'; btn.disabled = false;
-
-      // Save to KV in background
-      fetch('/api/share', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(song) }).catch(()=>{});
+      // Always show modal — gives user image + link for Stories
+      showShareModal(imgUrl, imgBlob, songPageUrl);
 
     } catch (e) {
       btn.textContent = '♫ SHARE THIS SONG'; btn.disabled = false;
     }
   }
 
-  function showShareModal(imgUrl, imgBlob) {
+  function showShareModal(imgUrl, imgBlob, songPageUrl) {
     const existing = document.getElementById('share-modal');
     if (existing) existing.remove();
     const modal = document.createElement('div');
     modal.id = 'share-modal';
-    modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.85);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;';
+    modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.92);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:24px 16px;overflow-y:auto;';
+
+    const linkHtml = songPageUrl ? `
+      <div style="font-family:VT323,monospace;font-size:16px;color:#9999bb;margin:14px 0 6px;letter-spacing:1px;">2. COPY LINK → ADD AS STORY STICKER</div>
+      <div style="display:flex;gap:8px;width:100%;max-width:320px;">
+        <div id="sm-url" style="flex:1;font-family:VT323,monospace;font-size:13px;color:#33ffcc;background:#0d0d1a;border:1px solid #6633cc;padding:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${songPageUrl}</div>
+        <button id="sm-copy" style="font-family:'Press Start 2P',monospace;font-size:7px;padding:10px 12px;background:#6633cc;color:#fff;border:none;cursor:pointer;white-space:nowrap;">COPY</button>
+      </div>
+      <div style="font-family:VT323,monospace;font-size:14px;color:#666688;margin-top:8px;text-align:center;max-width:300px;line-height:1.5;">open instagram → stories → add image → link sticker → paste url → viewers tap → your site → spotify</div>
+    ` : '';
+
     modal.innerHTML = `
-      <div style="font-family:VT323,monospace;font-size:18px;color:#9999bb;margin-bottom:12px;letter-spacing:1px;">SAVE IMAGE → SHARE TO STORIES</div>
-      <img src="${imgUrl}" style="max-width:260px;max-height:460px;border:2px solid #6633cc;margin-bottom:16px;" />
-      <button id="sm-download" style="font-family:'Press Start 2P',monospace;font-size:9px;padding:14px 20px;background:#6633cc;color:#fff;border:none;cursor:pointer;width:100%;max-width:280px;margin-bottom:10px;">⬇ SAVE TO CAMERA ROLL</button>
-      <button id="sm-close" style="font-family:VT323,monospace;font-size:18px;padding:10px 20px;background:transparent;color:#9999bb;border:1px solid #333;cursor:pointer;width:100%;max-width:280px;">CLOSE</button>
+      <div style="font-family:'Press Start 2P',monospace;font-size:9px;color:#ff66ff;margin-bottom:16px;letter-spacing:1px;text-align:center;">SHARE TO IG STORIES</div>
+      <div style="font-family:VT323,monospace;font-size:16px;color:#9999bb;margin-bottom:8px;letter-spacing:1px;">1. SAVE CARD IMAGE</div>
+      <img src="${imgUrl}" style="max-width:180px;max-height:320px;border:2px solid #6633cc;box-shadow:0 0 20px rgba(102,51,204,0.5);margin-bottom:10px;" />
+      <button id="sm-download" style="font-family:'Press Start 2P',monospace;font-size:8px;padding:12px 20px;background:#6633cc;color:#fff;border:none;cursor:pointer;width:100%;max-width:320px;">⬇ SAVE IMAGE</button>
+      ${linkHtml}
+      <button id="sm-close" style="font-family:VT323,monospace;font-size:18px;padding:10px 20px;background:transparent;color:#9999bb;border:1px solid #333;cursor:pointer;width:100%;max-width:320px;margin-top:14px;">CLOSE</button>
     `;
     document.body.appendChild(modal);
+
     document.getElementById('sm-download').onclick = () => {
       const a = document.createElement('a');
       a.href = imgUrl; a.download = 'song-card.png';
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
     };
+
+    if (songPageUrl) {
+      document.getElementById('sm-copy').onclick = async () => {
+        try {
+          await navigator.clipboard.writeText(songPageUrl);
+          document.getElementById('sm-copy').textContent = '✓';
+          setTimeout(() => { const b = document.getElementById('sm-copy'); if(b) b.textContent = 'COPY'; }, 2000);
+        } catch(e) {}
+      };
+    }
+
     document.getElementById('sm-close').onclick = () => { modal.remove(); URL.revokeObjectURL(imgUrl); };
     modal.onclick = e => { if(e.target===modal){ modal.remove(); URL.revokeObjectURL(imgUrl); } };
   }
