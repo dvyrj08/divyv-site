@@ -242,6 +242,13 @@
   }
 
   loadSong();
+
+  // Tap anywhere → divyv.vercel.app (except the Spotify button)
+  document.body.style.cursor = 'pointer';
+  document.addEventListener('click', function(e) {
+    if (e.target.closest('.listen-btn')) return;
+    window.location.href = 'https://divyv.vercel.app';
+  });
 </script>
 </body>
 </html>
