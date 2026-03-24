@@ -1426,31 +1426,29 @@
       const ext = videoBlob.type.includes('mp4') ? 'mp4' : 'webm';
       const videoFile = new File([videoBlob], `song.${ext}`, { type: videoBlob.type });
 
-      // Try file share (triggers Instagram Stories on Android/iOS)
-      if (navigator.canShare && navigator.canShare({ files: [videoFile] })) {
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+      if (isMobile && navigator.canShare && navigator.canShare({ files: [videoFile] })) {
+        // Mobile: share video file → Instagram Stories appears in share sheet
         await navigator.share({ files: [videoFile] });
-      } else if (navigator.share && data.url) {
-        await navigator.share({
-          title: `${currentSongData.title} — ${currentSongData.artist}`,
-          text: `check this out on divy's page`,
-          url: data.url,
-        });
+        btn.textContent = '♫ SHARE THIS SONG';
+        btn.disabled = false;
       } else {
-        // Desktop fallback: download video + copy link
+        // Desktop or fallback: auto-download the video
+        const url = URL.createObjectURL(videoBlob);
         const a = document.createElement('a');
-        a.href = URL.createObjectURL(videoBlob);
-        a.download = `song.${ext}`;
+        a.href = url;
+        a.download = `song-${Date.now()}.${ext}`;
+        document.body.appendChild(a);
         a.click();
-        if (data.url) await navigator.clipboard.writeText(data.url);
-        btn.textContent = '✓ VIDEO SAVED!';
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 5000);
+        btn.textContent = '✓ VIDEO DOWNLOADED!';
         btn.classList.add('copied');
         setTimeout(() => { btn.textContent = '♫ SHARE THIS SONG'; btn.classList.remove('copied'); btn.disabled = false; }, 3000);
-        return;
       }
-
-      btn.textContent = '♫ SHARE THIS SONG';
-      btn.disabled = false;
     } catch (e) {
+      // if user cancelled share sheet, just reset
       btn.textContent = '♫ SHARE THIS SONG';
       btn.disabled = false;
     }
